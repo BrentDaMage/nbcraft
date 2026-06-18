@@ -840,7 +840,7 @@ void Gui::renderToolBar(float f, float alpha)
 		currentShaderColor.a = alpha;
 	}
 
-	textures->loadAndBindTexture(C_BLOCKS_NAME);
+	textures->loadAndBindTexture(C_TEX_GUI_BLOCKS);
 
 	int diff = mc->useTouchscreen();
 
@@ -867,7 +867,7 @@ void Gui::renderToolBar(float f, float alpha)
 	// blit the "more items" button if using touch
 	if (mc->useTouchscreen())
 	{
-		textures->loadAndBindTexture(C_TERRAIN_NAME);
+		textures->loadAndBindTexture(C_TEX_TERRAIN);
 		blit(hotbarWidth / 2 - 19, -19, 208, 208, 16, 16, 0, 0);
 	}
 }

@@ -336,7 +336,7 @@ void LogoRenderer::render3d(float f)
 		matrix->scale(Vec3(0.89f, 1.0f, 0.4f));
 		matrix->translate(Vec3(-Width * 0.5f, -Height * 0.5f, 0.0f));
 
-		m_pMinecraft->m_pTextures->loadAndBindTexture(C_TERRAIN_NAME);
+		m_pMinecraft->m_pTextures->loadAndBindTexture(C_TEX_TERRAIN);
 		if (i == 0)
 		{
 			m_pMinecraft->m_pTextures->loadAndBindTexture("gui/black.png");

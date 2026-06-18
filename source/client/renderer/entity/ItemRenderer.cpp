@@ -92,7 +92,7 @@ void ItemRenderer::render(const Entity& entity, const Vec3& pos, float rot, floa
 	{
 		matrix->rotate(((float(itemEntity.m_age) + a) / 20.0f + itemEntity.m_bobOffs) * 57.296f, Vec3::UNIT_Y);
 
-		bindTexture(C_TERRAIN_NAME);
+		bindTexture(C_TEX_TERRAIN);
 
 		float scale = 0.5f;
 
@@ -122,7 +122,7 @@ void ItemRenderer::render(const Entity& entity, const Vec3& pos, float rot, floa
 		matrix->scale(0.5f);
 		int icon = itemStack.getIcon();
 
-		bindTexture(itemStack.getTile() ? C_TERRAIN_NAME : C_ITEMS_NAME);
+		bindTexture(itemStack.getTile() ? C_TEX_TERRAIN : C_TEX_ITEMS);
 
 		for (int i = 0; i < itemsToRender; i++)
 		{
@@ -263,7 +263,7 @@ void ItemRenderer::renderGuiItem(Font* font, Textures* textures, ItemStack& item
 	if (pTile && bCanRenderAsIs)
 	{
 #ifndef ENH_3D_INVENTORY_TILES
-		textures->loadAndBindTexture(C_BLOCKS_NAME);
+		textures->loadAndBindTexture(C_TEX_GUI_BLOCKS);
 
 		float texU = float(g_ItemFrames[item->getId()] % 10) * 48.0f;
 		float texV = float(g_ItemFrames[item->getId()] / 10) * 48.0f;
@@ -277,7 +277,7 @@ void ItemRenderer::renderGuiItem(Font* font, Textures* textures, ItemStack& item
 		t.vertexUV(float(x +  0), float(y +  0), 0.0f,  texU          / 512.0f,  texV          / 512.0f);
 		t.draw();
 #else
-		textures->loadAndBindTexture(C_TERRAIN_NAME);
+		textures->loadAndBindTexture(C_TEX_TERRAIN);
 
 		MatrixStack::Ref matrix = MatrixStack::World.push();
 
@@ -302,9 +302,9 @@ void ItemRenderer::renderGuiItem(Font* font, Textures* textures, ItemStack& item
 		// @BUG: The last bound texture will be the texture that ALL items will take. This is because begin and end calls
 		// have been void'ed by a  t.voidBeginAndEndCalls call in Gui::render.
 		if (item.getTile())
-			textures->loadAndBindTexture(C_TERRAIN_NAME);
+			textures->loadAndBindTexture(C_TEX_TERRAIN);
 		else
-			textures->loadAndBindTexture(C_ITEMS_NAME);
+			textures->loadAndBindTexture(C_TEX_ITEMS);
 
 		blit(x, y, 16 * (item.getIcon() % 16), 16 * (item.getIcon() / 16), 16, 16);
 	}

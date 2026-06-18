@@ -171,9 +171,9 @@ void ParticleEngine::render(const Entity& camera, float f)
 	for (int i = 0; i < 3; i++)
 	{
 		if (i == PT_TERRAIN)
-			m_pTextures->loadAndBindTexture(C_TERRAIN_NAME);
+			m_pTextures->loadAndBindTexture(C_TEX_TERRAIN);
 		else if (i == PT_PARTICLES2)
-			m_pTextures->loadAndBindTexture(C_ITEMS_NAME);
+			m_pTextures->loadAndBindTexture(C_TEX_ITEMS);
 		else
 			m_pTextures->loadAndBindTexture("particles.png");
 

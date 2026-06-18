@@ -19,7 +19,7 @@ DynamicTexture::DynamicTexture(int a2) : m_textureIndex(a2)
 
 TextureData* DynamicTexture::bindTexture(Textures* pTextures)
 {
-	return pTextures->loadAndBindTexture(C_TERRAIN_NAME);
+	return pTextures->loadAndBindTexture(C_TEX_TERRAIN);
 }
 
 DynamicTexture::~DynamicTexture()

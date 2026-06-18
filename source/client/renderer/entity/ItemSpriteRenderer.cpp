@@ -18,7 +18,7 @@ void ItemSpriteRenderer::render(const Entity& entity, const Vec3& pos, float rot
 
 	matrix->scale(0.5f);
 
-	bindTexture(C_ITEMS_NAME);
+	bindTexture(C_TEX_ITEMS);
 	
 	/*float texU_1 = float(16 * (m_sprite % 16))     / 256.0f;
 	float texU_2 = float(16 * (m_sprite % 16 + 1)) / 256.0f;

@@ -22,4 +22,6 @@ protected:
 	ICallback& m_callback;
 	int m_screenHeight;
 	bool m_bVertical;
+	TextureAtlasSprite m_sprite1;
+	TextureAtlasSprite m_sprite2;
 };

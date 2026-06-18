@@ -15,22 +15,13 @@ ItemPane::ItemPane(ICallback& callback, Textures& textures, const IntRectangle& 
     , m_callback(callback)
     , m_screenHeight(screenHeight)
     , m_bVertical(isVertical)
+    , m_sprite1(20, 32, 8, 8, C_TEX_SPRITESHEET, C_TEX_SPRITESHEET_WIDTH, C_TEX_SPRITESHEET_HEIGHT)
+    , m_sprite2(28, 32, 8, 8, C_TEX_SPRITESHEET, C_TEX_SPRITESHEET_WIDTH, C_TEX_SPRITESHEET_HEIGHT)
 {
     m_area.left -= 4.0f;
     m_area.right += 4.0f;
     m_area.top = 0.0f;
     m_area.bottom = bottom;
-
-    // @TODO: "gui/spritesheet.png" NinePatchFactory
-
-    IntRectangle rect1(20, 32, 8, 8);
-    IntRectangle rect2(28, 32, 8, 8);
-
-    //m_pPatchLayer = ninePatchFactory.sub_A9E38(rect1);
-    //m_pPatchLayer2 = ninePatchFactory.sub_A9E38(rect2);
-
-    // need a nineslice function that takes u,v, and uvWidth, uvHeight
-    //blitNineSlice(m_textures, "gui/spritesheet.png", m_xPos, m_yPos, m_width, m_height, 3);
 
     /*if ((areaRect.w + 4) != rect1.w || rect1.h != 22.0f)
     {

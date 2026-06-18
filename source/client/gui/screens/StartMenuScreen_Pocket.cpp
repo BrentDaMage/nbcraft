@@ -22,7 +22,7 @@ void StartMenuScreen_Pocket::_setup()
 
 	ImageDef image;
 	{
-		image.name = "gui/touchgui.png";
+		image.name = C_TEX_TOUCHGUI;
 		image.width = C_PRIMARY_TOUCH_BTN_SIZE;
 		image.height = C_PRIMARY_TOUCH_BTN_SIZE;
 		image.bUseCustomUV = true;

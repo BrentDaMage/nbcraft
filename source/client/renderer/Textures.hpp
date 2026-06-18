@@ -15,9 +15,14 @@
 #include "texture/TextureAtlas.hpp"
 #include "common/utility/HashMap.hpp"
 
-#define C_TERRAIN_NAME "terrain.png"
-#define C_ITEMS_NAME   "gui/items.png"
-#define C_BLOCKS_NAME  "gui/gui_blocks.png"
+#define C_TEX_TERRAIN     "terrain.png"
+#define C_TEX_ITEMS       "gui/items.png"
+#define C_TEX_GUI_BLOCKS  "gui/gui_blocks.png"
+#define C_TEX_TOUCHGUI    "gui/touchgui.png"
+
+#define C_TEX_SPRITESHEET "gui/spritesheet.png"
+#define C_TEX_SPRITESHEET_WIDTH  (128)
+#define C_TEX_SPRITESHEET_HEIGHT (128)
 
 class DynamicTexture; // in case we are being included from DynamicTexture. We don't store complete references to that
 

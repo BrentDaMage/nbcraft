@@ -31,7 +31,7 @@ void FallingTileRenderer::render(const Entity& entity, const Vec3& pos, float ro
 	MatrixStack::Ref matrix = MatrixStack::World.push();
 	matrix->translate(pos);
 
-	bindTexture(C_TERRAIN_NAME);
+	bindTexture(C_TEX_TERRAIN);
 
 	// @NOTE: Useless assignment. Already being done by the renderTile function
 	Tesselator::instance.color(1.0f, 1.0f, 1.0f);

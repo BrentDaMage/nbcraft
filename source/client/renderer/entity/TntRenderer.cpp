@@ -42,7 +42,7 @@ void TntRenderer::render(const Entity& entity, const Vec3& pos, float rot, float
 		matrix->scale(scale);
 	}
 
-	bindTexture(C_TERRAIN_NAME);
+	bindTexture(C_TEX_TERRAIN);
 
 	// @NOTE: Useless assignment. Already being done by the renderTile function
 	Tesselator::instance.color(1.0f, 1.0f, 1.0f);

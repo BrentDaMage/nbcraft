@@ -37,7 +37,7 @@ void SwitchButton::render(Minecraft* mc, const MenuPointer& pointer)
 
 	currentShaderColor = m_color;
 
-	mc->m_pTextures->loadAndBindTexture("gui/touchgui.png");
+	mc->m_pTextures->loadAndBindTexture(C_TEX_TOUCHGUI);
 
 	int uOffset = getOption().get() ? 160 + C_ON_OFF_SWITCH_WIDTH : 160;
 	int vOffset = 206;

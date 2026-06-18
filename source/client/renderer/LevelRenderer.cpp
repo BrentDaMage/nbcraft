@@ -1259,7 +1259,7 @@ void LevelRenderer::renderCracks(const Entity& camera, const HitResult& hr, int 
 	{
 		if (m_destroyProgress > 0.0f)
 		{
-			m_pTextures->loadAndBindTexture(C_TERRAIN_NAME);
+			m_pTextures->loadAndBindTexture(C_TEX_TERRAIN);
 			currentShaderColor = Color::WHITE;
 			currentShaderDarkColor = Color(1.0f, 1.0f, 1.0f, 0.5f);
 
@@ -1292,7 +1292,7 @@ void LevelRenderer::renderCracks(const Entity& camera, const HitResult& hr, int 
 	{
          float br = Mth::sin((float)getTimeMs() / 100.0f) * 0.2f + 0.8f;
 		 currentShaderColor = Color(br, br, br, Mth::sin((float)getTimeMs() / 200.0f) * 0.2f + 0.5f);
-		 m_pTextures->loadAndBindTexture(C_TERRAIN_NAME);
+		 m_pTextures->loadAndBindTexture(C_TEX_TERRAIN);
          TilePos tp = hr.m_tilePos.relative(hr.m_hitSide);
 	}*/
 }
@@ -1301,7 +1301,7 @@ void LevelRenderer::renderHitSelect(const Entity& camera, const HitResult& hr, i
 {
 	if (mode != 0) return;
 
-	m_pMinecraft->m_pTextures->loadAndBindTexture(C_TERRAIN_NAME);
+	m_pMinecraft->m_pTextures->loadAndBindTexture(C_TEX_TERRAIN);
 
 	Tile* pTile = nullptr;
 	TileID tileID = m_pLevel->getTile(hr.m_tilePos);
@@ -1530,7 +1530,7 @@ void LevelRenderer::renderLevel(const Entity& camera, FrustumCuller& culler, flo
 
 	bool fog = m_pDimension->isNaturalDimension();
 
-	textures.loadAndBindTexture(C_TERRAIN_NAME);
+	textures.loadAndBindTexture(C_TEX_TERRAIN);
 	Lighting::turnOff();
 	render(camera, Tile::RENDER_LAYER_SEASONS_OPAQUE, f, fog);
 	render(camera, Tile::RENDER_LAYER_OPAQUE, f, fog);
@@ -1558,7 +1558,7 @@ void LevelRenderer::renderLevel(const Entity& camera, FrustumCuller& culler, flo
 		RenderChunk::SetUnderwater(false);
 	}
 
-	textures.loadAndBindTexture(C_TERRAIN_NAME);
+	textures.loadAndBindTexture(C_TEX_TERRAIN);
 	render(camera, Tile::RENDER_LAYER_BLEND, f, fog);
 
 	renderContext.setShadeMode(mce::SHADE_MODE_FLAT);

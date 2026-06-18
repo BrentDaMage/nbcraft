@@ -167,7 +167,7 @@ void ItemInHandRenderer::renderItem(const Entity& entity, const ItemStack& item,
         currentShaderColor = Color::WHITE;
         currentShaderDarkColor = Color::WHITE;
         
-        m_pMinecraft->m_pTextures->loadAndBindTexture(C_TERRAIN_NAME);
+        m_pMinecraft->m_pTextures->loadAndBindTexture(C_TEX_TERRAIN);
         
 #ifdef ENH_SHADE_HELD_TILES
 #	define ARGPATCH , bright
@@ -189,9 +189,9 @@ void ItemInHandRenderer::renderItem(const Entity& entity, const ItemStack& item,
 
         std::string toBind;
         if (pTile)
-            toBind = C_TERRAIN_NAME;
+            toBind = C_TEX_TERRAIN;
         else
-            toBind = C_ITEMS_NAME;
+            toBind = C_TEX_ITEMS;
         m_pMinecraft->m_pTextures->loadAndBindTexture(toBind);
         
         constexpr float C_RATIO     = 1.0f / 256.0f;
@@ -284,13 +284,13 @@ void ItemInHandRenderer::renderScreenEffect(float a)
 
     if (player->isOnFire())
     {
-        textures->loadAndBindTexture(C_TERRAIN_NAME);
+        textures->loadAndBindTexture(C_TEX_TERRAIN);
         renderFire(a);
     }
 
     if (player->isInWall() && !m_pMinecraft->getOptions()->m_flightHax.get())
     {
-        textures->loadAndBindTexture(C_TERRAIN_NAME);
+        textures->loadAndBindTexture(C_TEX_TERRAIN);
 
         Tile* pTile = Tile::tiles[level->getTile(player->m_pos)];
         if (pTile)

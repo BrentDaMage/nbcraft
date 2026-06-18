@@ -950,7 +950,7 @@ void Minecraft::tick()
 			}
 		}
 
-		m_pTextures->loadAndBindTexture(C_TERRAIN_NAME);
+		m_pTextures->loadAndBindTexture(C_TEX_TERRAIN);
 
 		if (!isGamePaused())
 		{

@@ -51,7 +51,7 @@ void ContainerScreen::_renderSlot(Slot& slot)
         int icon = display.noItemIcon;
         if (icon >= 0)
         {
-            m_pMinecraft->m_pTextures->loadAndBindTexture(C_ITEMS_NAME);
+            m_pMinecraft->m_pTextures->loadAndBindTexture(C_TEX_ITEMS);
             blit(0, 0, (icon % 16) * 16, (icon / 16) * 16, 16, 16, 0, 0);
         }
 

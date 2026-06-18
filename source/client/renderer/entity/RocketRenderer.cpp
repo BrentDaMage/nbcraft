@@ -22,7 +22,7 @@ void RocketRenderer::render(const Entity& entity, const Vec3& pos, float rot, fl
 
 	float brightness = entity.getBrightness(1.0f);
 
-	bindTexture(C_ITEMS_NAME);
+	bindTexture(C_TEX_ITEMS);
 	m_renderer.renderTile(FullTile(&m_tile, 0), m_materials.entity_alphatest, brightness);
 }
 
