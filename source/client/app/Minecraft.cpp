@@ -67,6 +67,11 @@ const char* Minecraft::progressMessages[] =
 	"Saving chunks",
 };
 
+static AppPlatform* platform()
+{
+	return AppPlatform::singleton();
+}
+
 Minecraft::Minecraft()
 {
 	m_pOptions = nullptr;
@@ -219,7 +224,7 @@ void Minecraft::reloadInput()
 	{
 		m_pInputHolder = new CustomInputHolder(
 			new KeyboardInput(getOptions()),
-			new MouseTurnInput(this),
+			new MouseTurnInput(),
 			new MouseBuildInput()
 		);
 
@@ -250,7 +255,7 @@ void Minecraft::resetInputMethod()
 int Minecraft::getLicenseId()
 {
 	if (m_licenseID < 0)
-		m_licenseID = m_pPlatform->checkLicense();
+		m_licenseID = platform()->checkLicense();
 
 	return m_licenseID;
 }
@@ -781,7 +786,7 @@ void Minecraft::handleTextPaste(const std::string& text)
 
 void Minecraft::handleTextPaste()
 {
-	std::string text = AppPlatform::singleton()->getClipboardText();
+	std::string text = platform()->getClipboardText();
 	if (!text.empty())
 		handleTextPaste(text);
 }

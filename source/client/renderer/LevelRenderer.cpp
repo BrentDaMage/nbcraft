@@ -1426,7 +1426,7 @@ void LevelRenderer::takePicture(TripodCamera* pCamera, Entity* pOwner)
 	static char str[256];
 	sprintf(str, "img_%.4d.png", getTimeMs());
 
-	m_pMinecraft->platform()->saveScreenshot(std::string(str), Minecraft::width, Minecraft::height);
+	AppPlatform::singleton()->saveScreenshot(std::string(str), Minecraft::width, Minecraft::height);
 }
 
 void LevelRenderer::addParticle(const std::string& name, const Vec3& pos, const Vec3& dir)
