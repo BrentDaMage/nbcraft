@@ -139,33 +139,35 @@ std::string Util::getExtension(const std::string& path)
 	return path.substr(dotPos + 1);
 }
 
-std::string Util::toString(int value)
+std::string Util::toString(int32_t value)
 {
-	std::string str;
-
 	// Handle zero explicitly
 	if (value == 0)
-	{
-		str = "0";
-		return str;
-	}
+		return "0";
+
+	// 10 for digits, 1 for sign, 1 for null char
+	char buffer[12];
+
+	char* ptr = &buffer[sizeof(buffer)];
+	*(--ptr) = '\0';
 
 	// Use unsigned to safely handle INT_MIN
-	uint32_t uval = static_cast<uint32_t>((value < 0) ? -value : value);
+	uint32_t absValue = static_cast<uint32_t>(value);
+	if (value < 0)
+		absValue = 0 - absValue;
 
 	// Build the string backwards (more efficient than calculating powers of 10)
-	while (uval > 0)
+	while (absValue > 0)
 	{
-		str.push_back('0' + (uval % 10));
-		uval /= 10;
+		*(--ptr) = '0' + (absValue % 10);
+		absValue /= 10;
 	}
 
-	// Add sign and reverse
+	// Add sign
 	if (value < 0)
-		str.push_back('-');
+		*(--ptr) = '-';
 
-	std::reverse(str.begin(), str.end());
-	return str;
+	return std::string(ptr, sizeof(buffer) - (ptr - buffer));
 }
 
 std::string Util::toString(float value)

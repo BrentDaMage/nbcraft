@@ -34,7 +34,7 @@ public:
 	static std::string getFileName(const std::string& path);
 	static std::string getExtension(const std::string& path);
 
-	static std::string toString(int value);
+	static std::string toString(int32_t value);
 	static std::string toString(float value);
 #ifndef MC_NO_WSTRING
 	static std::string toString(const wchar_t* str);
