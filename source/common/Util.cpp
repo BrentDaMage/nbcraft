@@ -70,31 +70,83 @@ std::string Util::format(const char *fmt, ...)
 	return str;
 }
 
-// https://stackoverflow.com/questions/154536/encode-decode-urls-in-c
-std::string Util::urlEncode(const std::string& str)
+// Done this way for readability
+class CUrlEncodeCharacterWhitelist
 {
-	std::ostringstream escaped;
-	escaped.fill('0');
-	escaped << std::hex;
+private:
+	bool data[256];
 
-	for (std::string::const_iterator i = str.begin(), n = str.end(); i != n; ++i)
+private:
+	void whitelist(uint8_t c)
 	{
-		std::string::value_type c = (*i);
-
-		// Keep alphanumeric and other accepted characters intact
-		if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~')
-		{
-			escaped << c;
-			continue;
-		}
-
-		// Any other characters are percent-encoded
-		escaped << std::uppercase;
-		escaped << '%' << std::setw(2) << int((unsigned char)c);
-		escaped << std::nouppercase;
+		data[c] = true;
 	}
 
-	return escaped.str();
+public:
+	CUrlEncodeCharacterWhitelist()
+	{
+		memset(data, false, sizeof(data));
+
+		// whitelist alphanumeric
+		for (uint8_t c = 'a'; c <= 'z'; ++c)
+			whitelist(c);
+		for (uint8_t c = 'A'; c <= 'Z'; ++c)
+			whitelist(c);
+		for (uint8_t c = '0'; c <= '9'; ++c)
+			whitelist(c);
+
+		// whitelist specific cases
+		whitelist('-');
+		whitelist('_');
+		whitelist('.');
+		whitelist('~');
+	}
+
+	bool isWhitelisted(uint8_t c) const
+	{
+		return data[c];
+	}
+};
+
+static CUrlEncodeCharacterWhitelist UrlEncodeCharacterWhitelist;
+
+std::string Util::urlEncode(const std::string& str)
+{
+	if (str.empty())
+		return str;
+
+	std::string::size_type extraSize = 0;
+	for (std::string::size_type i = 0; i < str.size(); ++i)
+		if (!UrlEncodeCharacterWhitelist.isWhitelisted(str[i]))
+			extraSize += 2; // we need an additional 2 characters ('?' to '%??')
+
+	std::string output;
+	output.reserve(str.size() + extraSize);
+
+	char buffer[3];
+	buffer[0] = '%';
+
+	for (std::string::size_type i = 0; i < str.size(); ++i)
+	{
+		uint8_t c = str[i];
+
+		if (!UrlEncodeCharacterWhitelist.isWhitelisted(c))
+		{
+			// write the hex representation of this character
+			int cDiv16 = static_cast<int>(c) / 16;
+			int cMod16 = static_cast<int>(c) % 16;
+
+			buffer[1] = (cDiv16 <= 9) ? ('0' + cDiv16) : ('A' + cDiv16 - 10);
+			buffer[2] = (cMod16 <= 9) ? ('0' + cMod16) : ('A' + cMod16 - 10);
+			output.append(buffer, sizeof(buffer));
+		}
+		else
+		{
+			output += c;
+		}
+	}
+
+	return output;
 }
 
 bool Util::isValidPath(const std::string& path)
