@@ -120,6 +120,12 @@
     <ClInclude Include="$(MC_ROOT)\source\common\utility\ByteBuffer.hpp" />
     <ClInclude Include="$(MC_ROOT)\source\common\utility\HashMap.hpp" />
     <ClInclude Include="$(MC_ROOT)\source\common\MovePriorityQueue.hpp" />
+    <ClInclude Include="$(MC_ROOT)\source\common\threading\ThreadLocal.hpp" />
+    <ClInclude Include="$(MC_ROOT)\source\common\threading\ThreadLocal_fls.hpp" />
+    <ClInclude Include="$(MC_ROOT)\source\common\threading\ThreadLocal_tls.hpp" />
+    <ClInclude Include="$(MC_ROOT)\source\common\threading\Mutex.hpp" />
+    <ClInclude Include="$(MC_ROOT)\source\common\threading\Mutex_win32.hpp" />
+    <ClInclude Include="$(MC_ROOT)\source\common\threading\MutexGuards.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
