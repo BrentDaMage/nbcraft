@@ -97,6 +97,8 @@ public:
 	int getInventorySlot(int x) const;
 	TilePos getRespawnPosition() const { return m_respawnPos; }
 	int getScore() const { return m_score; }
+	void setName(const std::string& name);
+	const std::string getName() const { return m_name; }
 	void prepareCustomTextures();
 	void respawn();
 	void rideTick() override;
@@ -125,6 +127,7 @@ protected:
 	Abilities m_abilities;
 	ItemStack m_itemInUse;
 	int32_t m_itemInUseDuration;
+	std::string m_name;
 
 public:
 	Inventory* m_pInventory;
@@ -136,7 +139,7 @@ public:
 	float m_oBob;
 	float m_bob;
 	int m_dmgSpill;
-	std::string m_name;
+	Color m_color;
 	DimensionId m_dimension;
 	RakNet::RakNetGUID m_guid;
 	bool m_bFlying;

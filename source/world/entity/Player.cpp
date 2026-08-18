@@ -10,6 +10,18 @@
 #include "world/level/Level.hpp"
 #include "nbt/CompoundTag.hpp"
 
+static const Color _playerColors[] = {
+	0xFF000000,
+	0xFF33CC33,
+	0xFFCC3333,
+	0xFF3333CC,
+	0xFFCC33CC,
+	0xFFCC6633,
+	0xFFCCCC33,
+	0xFF33DCCC,
+};
+static const size_t _playerColorsCount = sizeof(_playerColors) / sizeof(Color);
+
 void Player::_init()
 {
 	m_itemInUseDuration = 0;
@@ -18,6 +30,7 @@ void Player::_init()
 	m_oBob = 0.0f;
 	m_bob = 0.0f;
 	m_dmgSpill = 0;
+	m_color = _playerColors[0];
 	m_dimension = DIMENSION_OVERWORLD;
 	m_bFlying = false;
 	m_jumpTriggerTime = 0;
@@ -486,6 +499,20 @@ float Player::getDestroySpeed(const Tile* tile) const
 int Player::getInventorySlot(int x) const
 {
 	return 0;
+}
+
+// Randomly generates a Player's color based on their name
+static const Color& _getPlayerColor(const std::string& name)
+{
+	Random random(Util::hashCode(name));
+	size_t colorIdx = random.nextInt(_playerColorsCount - 1);
+	return _playerColors[colorIdx];
+}
+
+void Player::setName(const std::string& name)
+{
+	m_name = name;
+	m_color = _getPlayerColor(name);
 }
 
 void Player::prepareCustomTextures()
