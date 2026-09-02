@@ -49,3 +49,19 @@ ItemPane::ItemPane(ICallback& callback, Textures& textures, const IntRectangle& 
         } while (v26 != 9);
     }*/
 }
+
+void ItemPane::_drawScrollBar(const ScrollBar& scrollBar)
+{
+    if (scrollBar.alpha <= 0.0f)
+        return;
+
+    fill(scrollBar.pos.x + 2.0f, scrollBar.pos.y,
+        (scrollBar.pos.x + 2.0f) + scrollBar.size.x, scrollBar.pos.y + scrollBar.size.y,
+        Color(255.0f, 255.0f, 255.0f, scrollBar.alpha));
+}
+
+void ItemPane::onSelect(int id, bool isSelected)
+{
+    if (isSelected)
+        m_callback.onItemSelected(*this, id);
+}

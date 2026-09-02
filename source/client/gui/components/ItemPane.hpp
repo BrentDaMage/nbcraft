@@ -18,6 +18,12 @@ public:
 	ItemPane(ICallback& callback, Textures& textures, const IntRectangle& areaRect, int itemCount, int bottom, int screenHeight, bool isVertical);
 
 protected:
+	void _drawScrollBar(const ScrollBar& scrollBar);
+
+public:
+	void onSelect(int id, bool isSelected) override;
+
+protected:
 	Textures& m_textures;
 	ICallback& m_callback;
 	int m_screenHeight;
