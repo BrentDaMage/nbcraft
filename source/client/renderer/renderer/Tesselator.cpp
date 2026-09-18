@@ -130,6 +130,10 @@ void Tesselator::_tex(const Vec2& uv, int count)
 	{
 		m_vertexFormat.enableField((mce::VertexField)(mce::VERTEX_FIELD_UV0 + count));
 	}
+    else
+    {
+        assert(m_vertexFormat.hasField((mce::VertexField)(mce::VERTEX_FIELD_UV0 + count)));
+    }
 }
 
 void Tesselator::clear()
@@ -205,6 +209,10 @@ void Tesselator::colorABGR(uint32_t c)
 	{
 		m_vertexFormat.enableField(mce::VERTEX_FIELD_COLOR);
 	}
+    else
+    {
+        assert(m_vertexFormat.hasField(mce::VERTEX_FIELD_COLOR));
+    }
 }
 
 void Tesselator::begin(int maxVertices)
@@ -240,7 +248,7 @@ void Tesselator::beginIndices(int maxIndices)
 
 	if (maxIndices <= 0 && m_drawMode == mce::PRIMITIVE_MODE_QUAD_LIST)
 	{
-		maxIndices = m_indexSize * 6 * (m_vertices / 4);
+		maxIndices = m_indexSize * 6 * Mth::intCeilDiv(m_vertices, 4);
 	}
 
 	if (maxIndices > 0)
@@ -379,6 +387,10 @@ void Tesselator::normal(float x, float y, float z)
 	{
 		m_vertexFormat.enableField(mce::VERTEX_FIELD_NORMAL);
 	}
+    else
+    {
+        assert(m_vertexFormat.hasField(mce::VERTEX_FIELD_NORMAL));
+    }
 }
 
 void Tesselator::setOffset(const Vec3& pos)
@@ -439,11 +451,14 @@ void Tesselator::vertex(float x, float y, float z)
 	}
 
 	bool didResize = m_indices.resize((m_vertices+1) * vertexSize);
-	(void)didResize; // to silence dumb warnings
 
+#ifdef _DEBUG
 	// useful for finding improperly pre-allocated Tesselator calls, reducing these reduces memcpy calls,
 	// which provides SUBSTANTIAL performace gains
-	//assert(!didResize);
+	assert(!didResize);
+#else
+	(void)didResize; // to silence dumb warnings
+#endif
 
 	// Make sure m_indices front pointer hasn't changed from reallocation as a result of reserve or resize
 	if (isFormatFixed() && oldIndicesPtr == m_indices.getData())

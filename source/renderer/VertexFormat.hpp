@@ -30,8 +30,10 @@ namespace mce
         void _init()
 		{
 			m_fieldMask = 0;
-			m_vertexSize = 0;
 			memset(m_fieldOffset, UINT8_MAX, sizeof(m_fieldOffset));
+			m_vertexSize = 0;
+            
+            enableField(VERTEX_FIELD_PADDING);
 		}
 
     public:
@@ -56,7 +58,7 @@ namespace mce
 
         const void* getFieldOffset(VertexField vertexField, const void *vertexData = nullptr) const
 		{
-			assert(m_fieldOffset[vertexField] != UINT8_MAX);
+            assert(m_fieldOffset[vertexField] != UINT8_MAX);
 			return tryGetFieldOffset(vertexField, vertexData);
 		}
 

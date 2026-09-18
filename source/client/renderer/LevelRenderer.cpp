@@ -820,7 +820,7 @@ void LevelRenderer::renderLineBox(const AABB& aabb, const mce::MaterialPtr& mate
 	t.vertex(aabb.min.x, aabb.max.y, aabb.max.z);
 	t.vertex(aabb.min.x, aabb.max.y, aabb.min.z);
 	t.draw(material);
-	t.begin(mce::PRIMITIVE_MODE_LINE_LIST, 5);
+	t.begin(mce::PRIMITIVE_MODE_LINE_LIST, 8);
 	t.vertex(aabb.min.x, aabb.min.y, aabb.min.z);
 	t.vertex(aabb.min.x, aabb.max.y, aabb.min.z);
 	t.vertex(aabb.max.x, aabb.min.y, aabb.min.z);
@@ -1689,7 +1689,7 @@ void LevelRenderer::renderShadow(const Entity& entity, const Vec3& pos, float r,
 	Vec3 ePosO(pos - ePos);
 
 	Tesselator& tt = Tesselator::instance;
-	tt.begin(0);
+	tt.begin(36);
 	TilePos tp(tpMin);
 	for (tp.x = tpMin.x; tp.x <= tpMax.x; tp.x++)
 	{
@@ -1950,7 +1950,7 @@ void LevelRenderer::renderAdvancedClouds(float alpha)
 #endif
 		}
 
-		t.begin(3216); // it doesn't get any bigger than this
+		t.begin(3360); // it doesn't get any bigger than this
 		for (int xPos = -radius + 1; xPos <= radius; xPos++)
 		{
 			for (int zPos = -radius + 1; zPos <= radius; zPos++)
