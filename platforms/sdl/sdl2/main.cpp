@@ -330,7 +330,7 @@ static void resize()
 	// give it an update.
 	// As said before, internally, this multiplies by the GUI scale multiplier
 	if (g_pApp)
-		g_pApp->sizeUpdate(windowWidth, windowHeight);
+		g_pApp->sizeUpdate(Minecraft::width, Minecraft::height);
 }
 
 // Main Loop
@@ -443,7 +443,7 @@ int main(int argc, char *argv[])
 	appPlatform->m_externalStorageDir = storagePath;
 	appPlatform->setVSyncEnabled(true);
 	g_pApp = new NinecraftApp;
-	g_pApp->init();
+	g_pApp->start();
 	
 	// Set Size
 	resize();

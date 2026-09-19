@@ -110,8 +110,8 @@ NSThread *G_drawFrameThread = nil;
     Minecraft::width = self.height; // drawWidth
     Minecraft::height = self.width; // drawHeight
 	Minecraft::SetRenderScaleMultiplier(self->viewScale);
-    self->_app->sizeUpdate(self.height / self->viewScale, self.width / self->viewScale); // windowWidth, windowHeight
-    NSLog(@"Updated draw size to %d, %d\n", self.height, self.width);
+    self->_app->sizeUpdate(Minecraft::width, Minecraft::height);
+    NSLog(@"Updated draw size to %d, %d\n", Minecraft::width, Minecraft::height);
 }
 
 - (void)awakeFromNib
@@ -198,12 +198,6 @@ NSThread *G_drawFrameThread = nil;
 
 - (void)dealloc
 {
-    //if (program)
-    //{
-    //    glDeleteProgram(program);
-    //    program = 0;
-    //}
-    
     // Tear down context.
     if ([EAGLContext currentContext] == context)
         [EAGLContext setCurrentContext:nil];
@@ -237,12 +231,6 @@ NSThread *G_drawFrameThread = nil;
 - (void)viewDidUnload
 {
 	[super viewDidUnload];
-	
-    //if (program)
-    //{
-    //    glDeleteProgram(program);
-    //    program = 0;
-    //}
     
     // Tear down context.
     if ([EAGLContext currentContext] == context)
@@ -262,19 +250,10 @@ NSThread *G_drawFrameThread = nil;
     
     app->init();
     
-    /*var1 = app->field_10;
-     app->var3 = *self->_context;
-     if ( var1 )
-     {
-     ((void (__fastcall *)(App *))var0[15])(app);
-     }
-     else
-     {
-     ((void (__fastcall *)(App *))var0[14])(app);
-     app->field_10 = 1;
-     }*/
-    
     [self updateDrawSize];
+    
+    app->start();
+    
     // Update draw size when device orientation changes (this accounts for typical view resizes)
     //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateDrawSize) name:UIDeviceOrientationDidChangeNotification object:nil];
     
@@ -381,6 +360,7 @@ NSThread *G_drawFrameThread = nil;
 {
     [super didReceiveMemoryWarning];
     // Release any cached data, images, etc. that aren't in use.
+    _platform->_fireLowMemory();
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation

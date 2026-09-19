@@ -38,6 +38,7 @@ protected:
 public:
 	bool handleBack(bool) override;
 	void init() override;
+    void start() override;
 	void setupRenderer();
 	void update() override;
 	void onGraphicsReset();

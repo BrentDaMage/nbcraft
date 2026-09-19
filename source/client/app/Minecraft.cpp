@@ -1168,14 +1168,14 @@ void Minecraft::prepareLevel(const std::string& unused)
 
 void Minecraft::sizeUpdate(int newWidth, int newHeight)
 {
-	float baseScale = getBestScaleForThisScreenSize(newWidth, newHeight);
-	
-	// re-calculate the GUI scale.
-	Gui::GuiScale = baseScale / GetRenderScaleMultiplier();
+    float renderScale = GetRenderScaleMultiplier();
+    
+    // re-calculate the GUI scale.
+	Gui::GuiScale = 1.0f / getBestScaleForThisScreenSize(newWidth * renderScale, newHeight * renderScale);
 
 	// The ceil gives an extra pixel to the screen's width and height, in case the GUI scale doesn't
 	// divide evenly into width or height, so that none of the game screen is uncovered.
-	float newGuiWidth = ceilf(Minecraft::width * Gui::GuiScale);
+	float newGuiWidth  = ceilf(Minecraft::width  * Gui::GuiScale);
 	float newGuiHeight = ceilf(Minecraft::height * Gui::GuiScale);
 	
 	// GuiSize did not change, bail out
@@ -1228,41 +1228,54 @@ float Minecraft::getBestScaleForThisScreenSize(int width, int height)
 		for (scale = 1; width / (scale + 1) >= 320 && height / (scale + 1) >= 240; ++scale)
 		{
 		}
-		return 1.0f / scale;
+		return scale;
 	}
 #endif
 
-	if (height > 1800)
-		return 1.0f / 8.0f;
+    if (height >= 1800)
+		return 8.0f;
 
 	if (useTouchscreen())
 	{
-		if (height > 1100)
-			return 1.0f / 6.0f;
+		/*
+        // Our custom (broken) logic
+        if (height >= 1100)
+			return 6.0f;
 
-		if (height > 900)
-			return 1.0f / 5.0f;
+		if (height >= 900)
+			return 5.0f;
 
-		if (height > 700)
-			return 1.0f / 4.0f;
+		if (height >= 700)
+			return 4.0f;
 
-		if (height > 500)
-			return 1.0f / 3.0f;
+		if (height >= 500)
+			return 3.0f;
 
-		if (height > 300)
-			return 1.0f / 2.0f;
+		if (height >= 300)
+			return 2.0f;
+        */
+        
+        // PE 0.3.3 logic
+        if (width >= 1000)
+            return 4.0f;
+        
+        if (width >= 800)
+            return 3.0f;
+        
+        if (width >= 400)
+            return 2.0f;
 	}
 	else
 	{
 		// @PARITY-JAVA: This is the screen scaling we use on non-touchscreen devices (minus Xboxes)
-		if (height > 1600)
-			return 1.0f / 4.0f;
+		if (height >= 1600)
+			return 4.0f;
 
-		if (height > 800)
-			return 1.0f / 3.0f;
+		if (height >= 800)
+			return 3.0f;
 
-		if (height > 400)
-			return 1.0f / 2.0f;
+		if (height >= 400)
+			return 2.0f;
 	}
 
 	return 1.0f;

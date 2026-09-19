@@ -243,7 +243,7 @@ static void resize()
     Minecraft::SetRenderScaleMultiplier(g_fPointToPixelScale);
 
     if (g_pApp)
-        g_pApp->sizeUpdate(screen->w, screen->h);
+        g_pApp->sizeUpdate(Minecraft::width, Minecraft::height);
 }
 
 // Main Loop
@@ -320,7 +320,7 @@ int main(int argc, char* argv[])
     appPlatform->m_externalStorageDir = storagePath;
     //LOG_I("Initializing NinecraftApp...");
     g_pApp = new NinecraftApp;
-    g_pApp->init();
+    g_pApp->start();
 
     resize();
     // We're off to the races

@@ -900,7 +900,7 @@ void UIThemeOption::apply()
 {
 	Minecraft& mc = *m_pMinecraft;
 
-	if (mc.getOptions() && mc.getOptions()->m_logoType.get() == LOGO_AUTO)
+	if (mc.getOptions())
 	{
 		mc.getOptions()->m_logoType.apply();
 	}

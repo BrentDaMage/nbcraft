@@ -59,6 +59,7 @@ void __cdecl main()
 	// initialize the app
 	g_pApp->init();
 	g_pApp->sizeUpdate(Minecraft::width, Minecraft::height);
+    g_pApp->start();
 
 	while (!g_pApp->wantToQuit())
 	{

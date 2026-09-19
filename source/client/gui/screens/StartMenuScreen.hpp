@@ -24,6 +24,7 @@ protected:
 	void _updateLicense();
 	void _buttonClicked(Button*) override;
 	virtual void _setup();
+    void _setupGenericPositions();
 	void _setupPositions();
 
 public:

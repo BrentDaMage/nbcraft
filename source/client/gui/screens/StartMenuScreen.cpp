@@ -25,7 +25,7 @@
 
 StartMenuScreen::StartMenuScreen()
 	: m_buyButton(0, 0, 78, 22, "Buy")
-	, m_creditsButton(0, 0, 78, 22, "")
+	, m_creditsButton(0, 0, 0, 0, "")
 {
 	m_chosenSplash = SplashManager::singleton().getSplash();
 }
@@ -103,10 +103,20 @@ void StartMenuScreen::_buttonClicked(Button* pButton)
 void StartMenuScreen::_setup()
 {
 	m_startButton   = new Button(0, 0, 160, 24, "Start Game");
-	m_joinButton    = new Button(0, 0, 160, 24, "Join Game");
-	m_optionsButton = new Button(0, 0,  78, 22, "Options");
+	m_joinButton    = new Button(0, 0, 160, 0,  "Join Game");
+	m_optionsButton = new Button(0, 0,  78, 0,  "Options");
 
 	_setupPositions();
+}
+
+void StartMenuScreen::_setupGenericPositions()
+{
+    // Do the exact logo bounds
+    const IntRectangle& bounds = LogoRenderer::singleton().getBounds();
+    m_creditsButton.m_xPos   = bounds.x;
+    m_creditsButton.m_yPos   = bounds.y;
+    m_creditsButton.m_width  = bounds.w;
+    m_creditsButton.m_height = bounds.h;
 }
 
 void StartMenuScreen::_setupPositions()
@@ -115,12 +125,14 @@ void StartMenuScreen::_setupPositions()
 
 	m_startButton->m_width = m_joinButton->m_width = 160;
 	m_optionsButton->m_width = m_buyButton.m_width = 78;
-	m_startButton->m_height = m_joinButton->m_height = m_optionsButton->m_height = m_buyButton.m_height = 25;
+    
+    // Sync button heights
+	m_joinButton->m_height = m_optionsButton->m_height = m_buyButton.m_height = m_startButton->m_height;
 
 	m_joinButton->m_yPos = yPos + 25;
 	m_startButton->m_yPos = yPos - 3;
 
-	yPos += 55;
+	yPos += 53;
 
 	m_optionsButton->m_yPos = yPos;
 	m_buyButton.m_yPos = yPos;
@@ -142,17 +154,15 @@ void StartMenuScreen::_setupPositions()
 		m_optionsButton->m_width = m_startButton->m_width;
 	}
 #endif
+    
+    _setupGenericPositions();
 }
 
 void StartMenuScreen::init()
 {
 	_setup();
 
-	// same place no matter the theme
-	m_creditsButton.m_xPos = 0;
-	m_creditsButton.m_yPos = 0;
-	m_creditsButton.m_width = m_width;
-	m_creditsButton.m_height = 75;
+	// same no matter the theme
 	m_creditsButton.m_color.a = 0.0f;
 
 	// add the buttons to the screen:

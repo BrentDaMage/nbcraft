@@ -462,7 +462,7 @@ void TouchscreenInput_TestFps::render(float f)
 	bool flying = m_pOptions->m_flightHax.get() || m_pMinecraft->m_pLocalPlayer->m_bFlying;
     
 	Tesselator& t = Tesselator::instance;
-	t.begin(0);
+	t.begin(36);
 #ifdef ENH_NEW_TOUCH_CONTROLS
 	if (m_bForwardBeingHeld && !isButtonDown(100 + INPUT_JUMP)) 
 	{

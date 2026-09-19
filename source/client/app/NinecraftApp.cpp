@@ -227,17 +227,6 @@ void NinecraftApp::_initAll()
 	SplashManager::singleton().init(m_pUser->m_name);
 
 	field_D9C = 0;
-
-	if (getOptions()->getUiTheme() == UI_CONSOLE)
-	{
-		setScreen(new AutosaveWarningScreen_Console(m_pScreen));
-	}
-	else
-	{
-		gotoMainMenu();
-	}
-
-	LogoRenderer::singleton().build(Gui::GuiWidth);
 }
 
 bool NinecraftApp::handleBack(bool b)
@@ -334,6 +323,24 @@ void NinecraftApp::init()
 #else
 	_initAll();
 #endif
+    
+    App::init();
+}
+
+void NinecraftApp::start()
+{
+    App::start();
+    
+	if (getOptions()->getUiTheme() == UI_CONSOLE)
+	{
+		setScreen(new AutosaveWarningScreen_Console(m_pScreen));
+	}
+	else
+	{
+		gotoMainMenu();
+	}
+    
+	LogoRenderer::singleton().build(Gui::GuiWidth);
 }
 
 void NinecraftApp::setupRenderer()

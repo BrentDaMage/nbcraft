@@ -1331,7 +1331,7 @@ void LevelRenderer::renderHitSelect(const Entity& camera, const HitResult& hr, i
 	float pz = camera.m_posPrev.z + (camera.m_pos.z - camera.m_posPrev.z) * a;
 
 	Tesselator& t = Tesselator::instance;
-	t.begin(12);
+	t.begin(24);
 	t.setOffset(-px, -py, -pz);
 	t.noColor();
 	if (!pTile)

@@ -233,7 +233,7 @@ float Screen::getScale(int width, int height)
 
 float Screen::GetConsoleScale(int height)
 {
-	return 1.0f / float(Mth::round((Mth::round(height / 180.0f) * 180) / 360.0f) / 2.0f);
+	return float(Mth::round((Mth::round(height / 180.0f) * 180) / 360.0f) / 2.0f);
 }
 
 void Screen::setTextboxText(const std::string& text)
