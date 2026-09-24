@@ -1,6 +1,7 @@
 #include <typeinfo>
 #include "BufferD3D9.hpp"
 #include "common/Logger.hpp"
+#include "compat/PlatformDefinitions.h"
 #include "renderer/hal/d3d9/helpers/ErrorHandlerD3D9.hpp"
 #include "renderer/hal/interface/RenderContext.hpp"
 
@@ -19,7 +20,7 @@ D3DFORMAT D3DFormatFromStride(unsigned int stride)
     }
 }
 
-DWORD mapTypeToD3DLockType(MapType mapType)
+DWORD mapTypeToD3DLockType(MapType mapType, bool isDynamic)
 {
     switch (mapType)
     {
@@ -27,12 +28,12 @@ DWORD mapTypeToD3DLockType(MapType mapType)
     case MAP_WRITE:              return 0x0;
     case MAP_WRITE_DISCARD:
 // Direct3D9: (ERROR) :Can specify D3DLOCK_DISCARD or D3DLOCK_NOOVERWRITE for only Vertex Buffers created with D3DUSAGE_DYNAMIC
-/*#ifdef D3DLOCK_DISCARD
-		return D3DLOCK_DISCARD; // may need to be disabled on some older GPUs, we'll see
-#else*/
+#ifdef D3DLOCK_DISCARD
+		return isDynamic ? D3DLOCK_DISCARD : 0x0;
+#else
         // 360 seems to discard by default
         return 0x0;
-//#endif
+#endif
     case MAP_WRITE_NO_OVERWRITE: return D3DLOCK_NOOVERWRITE;
     default:
         LOG_E("Unknown mapType: %d", mapType);
@@ -43,6 +44,7 @@ DWORD mapTypeToD3DLockType(MapType mapType)
 BufferD3D9::BufferD3D9()
 {
     m_format = D3DFMT_UNKNOWN;
+    m_bDynamic = false;
 }
 
 BufferD3D9::~BufferD3D9()
@@ -53,11 +55,14 @@ BufferD3D9::~BufferD3D9()
 void BufferD3D9::_createBuffer(RenderContext& context, unsigned int stride, ByteBuffer& data, unsigned int count, BufferType bufferType, bool isDynamic)
 {
     D3DDevice d3dDevice = context.getD3DDevice();
-    DWORD usage = isDynamic ? D3DUSAGE_DYNAMIC : 0x0;
     unsigned int size = stride * count;
+    DWORD usage = D3DUSAGE_WRITEONLY;
+    if (isDynamic) usage |= D3DUSAGE_DYNAMIC;
 
     m_vertexBuffer.release();
     m_indexBuffer.release();
+
+    m_bDynamic = isDynamic;
 
     switch (bufferType)
     {
@@ -111,6 +116,7 @@ void BufferD3D9::_move(BufferD3D9& other)
         this->m_vertexBuffer._move(other.m_vertexBuffer);
         this->m_indexBuffer._move(other.m_indexBuffer);
         std::swap(this->m_format, other.m_format);
+		std::swap(this->m_bDynamic, other.m_bDynamic);
         std::swap(this->m_bufferOffset, other.m_bufferOffset);
     }
 	
@@ -163,31 +169,37 @@ void BufferD3D9::resizeBuffer(RenderContext& context, ByteBuffer& data, unsigned
 
 void BufferD3D9::updateBuffer(RenderContext& context, unsigned int stride, ByteBuffer& data, unsigned int count, MapType mapType)
 {
-    if (m_internalSize < stride * count)
+    size_t size = stride * count;
+
+    if (m_internalSize < size)
     {
         createDynamicBuffer(context, stride, data, count, m_bufferType);
         return;
     }
 
     void* pData;
-    DWORD lockFlags = mapTypeToD3DLockType(mapType);
+    DWORD lockFlags = mapTypeToD3DLockType(mapType, m_bDynamic);
 
     switch (m_bufferType)
     {
     case BUFFER_TYPE_VERTEX:
-        ErrorHandlerD3D9::checkForErrors(m_vertexBuffer->Lock(0, 0, &pData, lockFlags));
+        ErrorHandlerD3D9::checkForErrors(m_vertexBuffer->Lock(m_bufferOffset, size, &pData, lockFlags));
         break;
     case BUFFER_TYPE_INDEX:
         m_format = D3DFormatFromStride(stride);
-        ErrorHandlerD3D9::checkForErrors(m_indexBuffer->Lock(0, 0, &pData, lockFlags));
+        ErrorHandlerD3D9::checkForErrors(m_indexBuffer->Lock(m_bufferOffset, size, &pData, lockFlags));
         break;
     default:
         LOG_E("Unknown bufferType: %d", m_bufferType);
         throw std::bad_cast();
     }
 
+#if MC_PLATFORM_XBOX360
     // 360 requires that we lock the entire buffer
-    memcpy((int8_t*)pData + m_bufferOffset, data.getData(), stride * count);
+    memcpy((int8_t*)pData + m_bufferOffset, data.getData(), size);
+#else
+    memcpy((int8_t*)pData, data.getData(), size);
+#endif
  
     switch (m_bufferType)
     {
