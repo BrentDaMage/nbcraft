@@ -22,6 +22,7 @@ add_library(nbcraft-core STATIC
     client/app/AppPlatformListener.cpp
     client/app/Minecraft.cpp
     client/app/NinecraftApp.cpp
+    client/app/VirtualKeyboardManager.cpp
     client/resources/AppResourceLoader.cpp
     client/resources/Resource.cpp
     client/resources/ResourceLoader.cpp

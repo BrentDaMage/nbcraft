@@ -4,7 +4,7 @@ IBuildInput::~IBuildInput()
 {
 }
 
-void IBuildInput::setScreenSize(int width, int height)
+void IBuildInput::setScreenSize(const ViewportSize& size)
 {
 }
 

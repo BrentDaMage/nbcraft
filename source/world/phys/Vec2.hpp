@@ -31,8 +31,10 @@ public:
 	Vec2() : x(0), y(0) {}
 	Vec2(float xy) : x(xy), y(xy) {}
 	Vec2(int xy) : x(float(xy)), y(float(xy)) {}
+	Vec2(unsigned int xy) : x(float(xy)), y(float(xy)) {}
 	Vec2(float x, float y) : x(x), y(y) {}
 	Vec2(int x, int y) : x(float(x)), y(float(y)) {}
+	Vec2(unsigned int x, unsigned int y) : x(float(x)), y(float(y)) {}
     
     Vec2 normalize() const
 	{

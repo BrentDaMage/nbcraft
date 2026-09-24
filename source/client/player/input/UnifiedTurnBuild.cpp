@@ -11,7 +11,7 @@
 
 #include "world/entity/Player.hpp"
 
-UnifiedTurnBuild::UnifiedTurnBuild(int a, int width, int height, float d, float e, IInputHolder* pHolder) :
+UnifiedTurnBuild::UnifiedTurnBuild(int a, const ViewportSize& size, float d, float e, IInputHolder* pHolder) :
 	field_C(a),
 	field_10(0),
 	m_screenArea(-1, -1, 0, 0),
@@ -30,7 +30,7 @@ UnifiedTurnBuild::UnifiedTurnBuild(int a, int width, int height, float d, float 
 {
 	m_includeExcludeArea.field_4 = false;
 
-	setScreenSize(width, height);
+	setScreenSize(size);
 	field_B8 = getTimeS();
 	field_CC = field_B8;
 	field_D0 = 0;
@@ -38,9 +38,9 @@ UnifiedTurnBuild::UnifiedTurnBuild(int a, int width, int height, float d, float 
 	field_D4 = false;
 }
 
-void UnifiedTurnBuild::setScreenSize(int width, int height)
+void UnifiedTurnBuild::setScreenSize(const ViewportSize& size)
 {
-	m_screenArea = RectangleArea(0.0f, 0.0f, float(width), float(height));
+	m_screenArea = RectangleArea(0.0f, 0.0f, float(size.physical.width), float(size.physical.height));
 
 	field_40.right += 10.0f + 0.05f * (field_40.right - field_40.left);
 	field_40.top   -= 10.0f + 0.05f * (field_40.bottom - field_40.top);

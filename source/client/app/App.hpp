@@ -16,14 +16,16 @@ class App : public AppPlatformListener
 protected:
 	App()
 	{
+        m_bInited = false;
 		m_bWantToQuit = false;
 	}
 
 public:
 	virtual bool handleBack(bool);
 	virtual void init();
+    virtual void start();
 	virtual void update();
-	virtual void sizeUpdate(int newWidth, int newHeight);
+	virtual void sizeUpdate();
 	virtual void setTextboxText(const std::string& text);
 
 	void destroy();
@@ -33,6 +35,9 @@ public:
 	void saveState(void**, int);
 	bool wantToQuit();
 
+protected:
+    bool m_bInited;
+    
 public:
 	bool m_bWantToQuit;
 

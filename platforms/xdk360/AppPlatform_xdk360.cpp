@@ -298,7 +298,11 @@ DWORD _getNativeVirtualKeyboardType(VirtualKeyboard::Type type)
 	case VirtualKeyboard::PASSWORD:          return VKBD_LATIN_PASSWORD;
 	default:                                 return VKBD_LATIN_FULL; // we don't support non-English in TextBoxes
 	}
+}
 
+bool AppPlatform_xdk360::hasVirtualKeyboard() const
+{
+	return true;
 }
 
 void AppPlatform_xdk360::showKeyboard(LocalPlayerID playerId, const VirtualKeyboard& keyboard)

@@ -1288,7 +1288,7 @@ void LevelRenderer::renderCracks(const Entity& camera, const HitResult& hr, int 
 
 			Tesselator& t = Tesselator::instance;
 
-			t.begin(12);
+			t.begin(24);
 			t.setOffset(-p);
 			t.noColor();
 			if (!pTile)
@@ -1331,7 +1331,7 @@ void LevelRenderer::renderHitSelect(const Entity& camera, const HitResult& hr, i
 	float pz = camera.m_posPrev.z + (camera.m_pos.z - camera.m_posPrev.z) * a;
 
 	Tesselator& t = Tesselator::instance;
-	t.begin(12);
+	t.begin(24);
 	t.setOffset(-px, -py, -pz);
 	t.noColor();
 	if (!pTile)
@@ -1412,7 +1412,7 @@ void LevelRenderer::takePicture(TripodCamera* pCamera, Entity* pOwner)
 	static char str[256];
 	sprintf(str, "img_%.4d.png", getTimeMs());
 
-	AppPlatform::singleton()->saveScreenshot(std::string(str), Minecraft::width, Minecraft::height);
+	AppPlatform::singleton()->saveScreenshot(std::string(str), Minecraft::GetWidthP(), Minecraft::GetHeightP());
 }
 
 void LevelRenderer::addParticle(const std::string& name, const Vec3& pos, const Vec3& dir)
@@ -1765,9 +1765,9 @@ void LevelRenderer::prepareAndRenderClouds(const Entity& camera, float f)
 
 	MatrixStack::Ref projMtx = MatrixStack::Projection.pushIdentity();
 	// Java
-	//projMtx->setPerspective(fov, float(Minecraft::width) / float(Minecraft::height), 0.05f, renderDistance * 512.0f);
+	//projMtx->setPerspective(fov, float(Minecraft::GetWidthP()) / float(Minecraft::GetHeightP()), 0.05f, renderDistance * 512.0f);
 	// PE (0.12.1)
-	projMtx->setPerspective(fov, float(Minecraft::width) / float(Minecraft::height), 2.0f, renderDistance * 5120.0f);
+	projMtx->setPerspective(fov, float(Minecraft::GetWidthP()) / float(Minecraft::GetHeightP()), 2.0f, renderDistance * 5120.0f);
 
 	MatrixStack::Ref viewMtx = MatrixStack::View.push();
 	_setupFog(camera, 0);

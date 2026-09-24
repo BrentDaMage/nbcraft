@@ -88,21 +88,31 @@ void* AppPlatform_sdl2::_getHWND() const
 
 const char* AppPlatform_sdl2::getWindowTitle() const
 {
+	// @TODO: why tf are we querying this directly? who else is going to change it other than us?
 	return SDL_GetWindowTitle(m_pWindow);
 }
 
 int AppPlatform_sdl2::getScreenWidth() const
 {
-	int width;
+	/*int width;
 	SDL_GL_GetDrawableSize(m_pWindow, &width, nullptr);
-	return width;
+	return width;*/
+
+	return 0;
 }
 
 int AppPlatform_sdl2::getScreenHeight() const
 {
-	int height;
+	/*int height;
 	SDL_GL_GetDrawableSize(m_pWindow, nullptr, &height);
-	return height;
+	return height;*/
+
+	return 0;
+}
+
+bool AppPlatform_sdl2::hasVirtualKeyboard() const
+{
+	return true;
 }
 
 void AppPlatform_sdl2::showKeyboard(LocalPlayerID playerId, const VirtualKeyboard& keyboard)

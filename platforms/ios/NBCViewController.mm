@@ -26,18 +26,9 @@
 #include "EAGLView.h"
 #include "ShowKeyboardView.h"
 
-extern bool g_bIsMenuBackgroundAvailable;
-
 NSThread *G_drawFrameThread = nil;
 
 @interface NBCViewController () {
-    GLuint _program;
-    
-    float _rotation;
-    
-    GLuint _vertexArray;
-    GLuint _vertexBuffer;
-    
     Minecraft *_app;
     AppContext *_context;
     AppPlatform_iOS *_platform;
@@ -80,8 +71,8 @@ NSThread *G_drawFrameThread = nil;
         bounds.origin.x = 0, bounds.origin.y = 0;
         bounds.size.width = 0, bounds.size.height = 0;
     }
-    if (bounds.size.width > bounds.size.height)
-        bounds.size.height = bounds.size.width;
+    if (bounds.size.height > bounds.size.width)
+        bounds.size.width = bounds.size.height;
     return bounds.size.width * self->viewScale;
 }
 
@@ -98,20 +89,18 @@ NSThread *G_drawFrameThread = nil;
         bounds.origin.x = 0, bounds.origin.y = 0;
         bounds.size.width = 0, bounds.size.height = 0;
     }
-    if (bounds.size.width > bounds.size.height)
+    if (bounds.size.width < bounds.size.height)
         bounds.size.height = bounds.size.width;
     return bounds.size.height * self->viewScale;
 }
 
 - (void)updateDrawSize
 {
-    // NOTE: Swapping width & height because of device orientation
-    // I guess when the device is sideways, the view doesn't rotate to be upright?
-    Minecraft::width = self.height; // drawWidth
-    Minecraft::height = self.width; // drawHeight
 	Minecraft::SetRenderScaleMultiplier(self->viewScale);
-    self->_app->sizeUpdate(self.height / self->viewScale, self.width / self->viewScale); // windowWidth, windowHeight
-    NSLog(@"Updated draw size to %d, %d\n", self.height, self.width);
+    Minecraft::SetViewportSize(self.width, self.height);
+	
+    self->_app->sizeUpdate();
+    NSLog(@"Updated draw size to %d, %d\n", Minecraft::GetWidthP(), Minecraft::GetHeightP());
 }
 
 - (void)awakeFromNib
@@ -198,12 +187,6 @@ NSThread *G_drawFrameThread = nil;
 
 - (void)dealloc
 {
-    //if (program)
-    //{
-    //    glDeleteProgram(program);
-    //    program = 0;
-    //}
-    
     // Tear down context.
     if ([EAGLContext currentContext] == context)
         [EAGLContext setCurrentContext:nil];
@@ -237,12 +220,6 @@ NSThread *G_drawFrameThread = nil;
 - (void)viewDidUnload
 {
 	[super viewDidUnload];
-	
-    //if (program)
-    //{
-    //    glDeleteProgram(program);
-    //    program = 0;
-    //}
     
     // Tear down context.
     if ([EAGLContext currentContext] == context)
@@ -262,21 +239,12 @@ NSThread *G_drawFrameThread = nil;
     
     app->init();
     
-    /*var1 = app->field_10;
-     app->var3 = *self->_context;
-     if ( var1 )
-     {
-     ((void (__fastcall *)(App *))var0[15])(app);
-     }
-     else
-     {
-     ((void (__fastcall *)(App *))var0[14])(app);
-     app->field_10 = 1;
-     }*/
-    
     [self updateDrawSize];
+    
+    app->start();
+    
     // Update draw size when device orientation changes (this accounts for typical view resizes)
-    //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateDrawSize) name:UIDeviceOrientationDidChangeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateDrawSize) name:UIDeviceOrientationDidChangeNotification object:nil];
     
     /*Minecraft *mc = (Minecraft *)app;
      mc->selectLevel("TestWorld", "Test", (int)"iOS");*/
@@ -381,6 +349,7 @@ NSThread *G_drawFrameThread = nil;
 {
     [super didReceiveMemoryWarning];
     // Release any cached data, images, etc. that aren't in use.
+    _platform->_fireLowMemory();
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -399,7 +368,6 @@ NSThread *G_drawFrameThread = nil;
         if (touchIndex > -1)
         {
             CGPoint point;
-            float posX, posY;
             if (touch)
             {
                 point = [touch locationInView:self.view];
@@ -409,11 +377,9 @@ NSThread *G_drawFrameThread = nil;
                 point.x = 0, point.y = 0;
                 //point2.x = 0, point2.y = 0;
             }
-            posX = viewScale * point.x;
-            posY = viewScale * point.y;
             
-            Mouse::feed(MOUSE_BUTTON_LEFT, true, posX, posY);
-            Multitouch::feed(MOUSE_BUTTON_LEFT, true, posX, posY, touchIndex);
+            Mouse::feed(MOUSE_BUTTON_LEFT, true, point.x, point.y);
+            Multitouch::feed(MOUSE_BUTTON_LEFT, true, point.x, point.y, touchIndex);
         }
     }
 }
@@ -426,7 +392,6 @@ NSThread *G_drawFrameThread = nil;
         if (touchIndex > -1)
         {
             CGPoint point;
-            float posX, posY;
             if (touch)
             {
                 point = [touch locationInView:self.view];
@@ -436,11 +401,9 @@ NSThread *G_drawFrameThread = nil;
                 point.x = 0, point.y = 0;
                 //point2.x = 0, point2.y = 0;
             }
-            posX = viewScale * point.x;
-            posY = viewScale * point.y;
             
-            Mouse::feed(MOUSE_BUTTON_NONE, false, posX, posY);
-            Multitouch::feed(MOUSE_BUTTON_NONE, false, posX, posY, touchIndex);
+            Mouse::feed(MOUSE_BUTTON_NONE, false, point.x, point.y);
+            Multitouch::feed(MOUSE_BUTTON_NONE, false, point.x, point.y, touchIndex);
         }
     }
 }
@@ -453,7 +416,6 @@ NSThread *G_drawFrameThread = nil;
         if (touchIndex > -1)
         {
             CGPoint point;
-            float posX, posY;
             if (touch)
             {
                 point = [touch locationInView:self.view];
@@ -463,11 +425,9 @@ NSThread *G_drawFrameThread = nil;
                 point.x = 0, point.y = 0;
                 //point2.x = 0, point2.y = 0;
             }
-            posX = viewScale * point.x;
-            posY = viewScale * point.y;
             
-            Mouse::feed(MOUSE_BUTTON_LEFT, false, posX, posY);
-            Multitouch::feed(MOUSE_BUTTON_LEFT, false, posX, posY, touchIndex);
+            Mouse::feed(MOUSE_BUTTON_LEFT, false, point.x, point.y);
+            Multitouch::feed(MOUSE_BUTTON_LEFT, false, point.x, point.y, touchIndex);
         }
     }
 }

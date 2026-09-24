@@ -271,6 +271,53 @@ static std::string getExternalStorageDir(struct engine* engine)
 #endif
 }
 
+static void _getDisplayDPIs(struct android_app* app, float& xdpi, float& ydpi)
+{
+    JavaVM* pVM = app->activity->vm;
+    JNIEnv* pEnv = app->activity->env;
+   
+    pVM->AttachCurrentThread(&pEnv, nullptr);
+
+    // Retrieves NativeActivity.
+    jobject lNativeActivity = app->activity->clazz;
+    jclass ClassNativeActivity = pEnv->GetObjectClass(lNativeActivity);
+
+    /*
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        this.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        xdpi = displayMetrics.xdpi;
+        ydpi = displayMetrics.ydpi;
+    */
+    
+    // Runs getWindowManager()
+    jmethodID methodGetWindowManager = pEnv->GetMethodID(ClassNativeActivity, "getWindowManager", "()Landroid/view/WindowManager;");
+    jobject windowManager = pEnv->CallObjectMethod(lNativeActivity, methodGetWindowManager);
+
+    // Runs windowManager.getDefaultDisplay()
+    jclass classWindowManager = pEnv->GetObjectClass(windowManager);
+    jmethodID methodGetDefaultDisplay = pEnv->GetMethodID(classWindowManager, "getDefaultDisplay", "()Landroid/view/Display;");
+    jobject display = pEnv->CallObjectMethod(windowManager, methodGetDefaultDisplay);
+
+    // Creates a new DisplayMetrics
+    jclass classDisplayMetrics = pEnv->FindClass("android/util/DisplayMetrics");
+    jmethodID methodDisplayMetricsInit = pEnv->GetMethodID(classDisplayMetrics, "<init>", "()V");
+    jobject displayMetrics = pEnv->NewObject(classDisplayMetrics, methodDisplayMetricsInit);
+
+    // Runs display.getMetrics(displayMetrics)
+    jclass classDisplay = pEnv->GetObjectClass(display);
+    jmethodID methodGetMetrics = pEnv->GetMethodID(classDisplay, "getMetrics", "(Landroid/util/DisplayMetrics;)V");
+    pEnv->CallVoidMethod(display, methodGetMetrics, displayMetrics);
+
+    // Gets displayMetrics.xdpi and ydpi
+    jfieldID fieldXdpi = pEnv->GetFieldID(classDisplayMetrics, "xdpi", "F");
+    jfieldID fieldYdpi = pEnv->GetFieldID(classDisplayMetrics, "ydpi", "F");
+
+    xdpi = pEnv->GetFloatField(displayMetrics, fieldXdpi);
+    ydpi = pEnv->GetFloatField(displayMetrics, fieldYdpi);
+
+    pVM->DetachCurrentThread();
+}
+
 /**
 * Process the next main command.
 */
@@ -329,28 +376,37 @@ static void initWindow(struct engine* engine, struct android_app* app)
         return;
     }
 
-    eglQuerySurface(engine->display, engine->surface, EGL_WIDTH, &w);
+    eglQuerySurface(engine->display, engine->surface, EGL_WIDTH,  &w);
     eglQuerySurface(engine->display, engine->surface, EGL_HEIGHT, &h);
 
     g_AppPlatform.initConsts();
     g_AppPlatform.setScreenSize(w, h);
     g_AppPlatform.initAndroidApp(app);
+	
+    float xdpi, ydpi;
+    _getDisplayDPIs(app, xdpi, ydpi);
 
-    engine->ninecraftApp->width = w;
-    engine->ninecraftApp->height = h;
+    unsigned int logicalWidth  = float(w * 160) / xdpi;
+    unsigned int logicalHeight = float(h * 160) / ydpi;
 
     if (!engine->initted)
     {
         g_AppPlatform.m_externalStorageDir = getExternalStorageDir(engine);
         g_AppPlatform.setExternalStoragePath(g_AppPlatform.m_externalStorageDir);
+		
         engine->ninecraftApp->init();
+		
+        Minecraft::SetViewportSize(w, h, logicalWidth, logicalHeight);
+        engine->ninecraftApp->sizeUpdate();
+		
+        engine->ninecraftApp->start();
     }
     else
     {
         engine->ninecraftApp->onGraphicsReset();
+        Minecraft::SetViewportSize(w, h, logicalWidth, logicalHeight);
+        engine->ninecraftApp->sizeUpdate();
     }
-
-    engine->ninecraftApp->sizeUpdate(w, h);
 
     engine->initted = true;
 
@@ -375,7 +431,9 @@ static void engine_handle_cmd(struct android_app* app, int32_t cmd) {
 
     case APP_CMD_TERM_WINDOW:
         LOG_I("APP_CMD_TERM_WINDOW");
-        engine->ninecraftApp->saveOptions();
+        
+        g_AppPlatform._fireAppTerminated();
+        
         if (engine->display)
         {
             eglMakeCurrent(engine->display, 0, 0, 0);
@@ -389,10 +447,20 @@ static void engine_handle_cmd(struct android_app* app, int32_t cmd) {
         break;
     case APP_CMD_GAINED_FOCUS:
         engine->animating = 1;
+        g_AppPlatform._fireAppFocusGained();
         break;
     case APP_CMD_LOST_FOCUS:
         engine->animating = 0;
-        engine->ninecraftApp->saveOptions();
+        g_AppPlatform._fireAppFocusLost();
+        break;
+    case APP_CMD_LOW_MEMORY:
+        g_AppPlatform._fireLowMemory();
+        break;
+    case APP_CMD_PAUSE:
+        g_AppPlatform._fireAppSuspended();
+        break;
+    case APP_CMD_RESUME:
+        g_AppPlatform._fireAppResumed();
         break;
     }
 }

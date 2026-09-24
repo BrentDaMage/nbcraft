@@ -49,7 +49,9 @@ NSError *G_audioSessionError = nil;
      */
     NSLog(@"resign-active: %@\n", [NSThread currentThread]);
     [self.viewController stopAnimation];
-    //AppPlatform_iOS *platform = [self.viewController platform];
+    
+    AppPlatform_iOS *platform = [self.viewController platform];
+    platform->_fireAppFocusLost();
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
@@ -93,6 +95,9 @@ NSError *G_audioSessionError = nil;
      */
     NSLog(@"become-active: %@\n", [NSThread currentThread]);
     [self.viewController startAnimation];
+
+    AppPlatform_iOS *platform = [self.viewController platform];
+    platform->_fireAppFocusGained();
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application
@@ -103,6 +108,9 @@ NSError *G_audioSessionError = nil;
      See also applicationDidEnterBackground:.
      */
     [self.viewController stopAnimation];
+	
+    AppPlatform_iOS *platform = [self.viewController platform];
+    platform->_fireAppTerminated();
 }
 
 - (void)beginInterruption

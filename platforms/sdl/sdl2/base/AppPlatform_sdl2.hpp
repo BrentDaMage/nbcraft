@@ -31,6 +31,7 @@ public:
 	int getScreenHeight() const override;
 
 	// On-screen keyboard
+	bool hasVirtualKeyboard() const override;
 	void showKeyboard(LocalPlayerID playerId, const VirtualKeyboard& keyboard) override;
 	void hideKeyboard(LocalPlayerID playerId) override;
 

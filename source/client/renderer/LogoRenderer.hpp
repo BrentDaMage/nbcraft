@@ -34,6 +34,7 @@ class LogoRenderer : public GuiComponent
 private:
     void _initTextures();
     void _build2dTitleMesh();
+    void _build3dTitleMesh();
 
 public:
     LogoRenderer();
@@ -50,6 +51,8 @@ public:
 
     void render2d();
     void render3d(float f);
+    
+    const IntRectangle& getBounds() const { return m_titleBounds; }
 
     static LogoRenderer& singleton()
     {
@@ -76,7 +79,7 @@ private:
     int m_width;
     std::string m_p2dTitleTexPath;
     mce::Mesh m_2dTitleMesh;
-    IntRectangle m_2dTitleBounds;
+    IntRectangle m_titleBounds;
     Random m_random;
     TileRenderer m_tileRenderer;
     TitleTile** m_pTiles;

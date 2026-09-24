@@ -10,6 +10,8 @@
 #include "server/ServerSideNetworkHandler.hpp"
 #include "client/renderer/LogoRenderer.hpp"
 
+//#define SHOW_LAN_BUTTON
+
 PauseScreen::PauseScreen() :
 	//m_oPos(0),
 	field_40(0),
@@ -25,28 +27,32 @@ PauseScreen::PauseScreen() :
 
 void PauseScreen::init()
 {
-	bool bAddVisibleButton = m_pMinecraft->m_pRakNetInstance && m_pMinecraft->m_pRakNetInstance->m_bIsHost;
-
 	std::vector<Button*> layoutButtons;
 
 	layoutButtons.push_back(&m_btnBack);
 #ifdef ENH_ADD_OPTIONS_PAUSE
 	layoutButtons.push_back(&m_btnOptions);
 #endif
+
+#ifdef SHOW_LAN_BUTTON
+	bool bAddVisibleButton = m_pMinecraft->m_pRakNetInstance && m_pMinecraft->m_pRakNetInstance->m_bIsHost;
 	if (bAddVisibleButton)
 	{
 		updateServerVisibilityText();
 		layoutButtons.push_back(&m_btnVisible);
 	}
+#endif
+
 	layoutButtons.push_back(&m_btnQuit);
 
-	int buttonsWidth = 160;
-	int buttonsHeight = 25;
-	int y = 48;
-	int ySpacing = 32;
-	bool cramped = m_height < y + ySpacing * int(layoutButtons.size()) + 10; // also add some padding
+	constexpr int buttonsWidth = 160;
+	constexpr int buttonsHeight = 25;
+	constexpr int y = 48;
+
+	int ySpacing = buttonsHeight + 7;
+	bool cramped = m_height < y + ySpacing * int(layoutButtons.size()) + 5; // also add some padding
 	if (cramped)
-		ySpacing = 25;
+		ySpacing = buttonsHeight + 1;
 
 	for (size_t i = 0; i < layoutButtons.size(); ++i)
 	{
@@ -58,8 +64,10 @@ void PauseScreen::init()
 		_addElement(*button);
 	}
 
+#ifdef SHOW_LAN_BUTTON
 #ifndef FEATURE_NETWORKING
 	m_btnVisible.setEnabled(false);
+#endif
 #endif
 }
 
@@ -101,6 +109,7 @@ void PauseScreen::_buttonClicked(Button* pButton)
 	if (pButton->getId() == m_btnQuitAndCopy.getId())
 		m_pMinecraft->leaveGame(true);
 
+#ifdef SHOW_LAN_BUTTON
 	if (pButton->getId() == m_btnVisible.getId())
 	{
 		if (m_pMinecraft->m_pRakNetInstance && m_pMinecraft->m_pRakNetInstance->m_bIsHost)
@@ -111,6 +120,7 @@ void PauseScreen::_buttonClicked(Button* pButton)
 			updateServerVisibilityText();
 		}
 	}
+#endif
 
 #ifdef ENH_ADD_OPTIONS_PAUSE
 	if (pButton->getId() == m_btnOptions.getId())

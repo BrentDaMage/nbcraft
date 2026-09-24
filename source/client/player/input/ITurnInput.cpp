@@ -13,7 +13,7 @@ ITurnInput::~ITurnInput()
 {
 }
 
-void ITurnInput::setScreenSize(int width, int height)
+void ITurnInput::setScreenSize(const ViewportSize& size)
 {
 }
 

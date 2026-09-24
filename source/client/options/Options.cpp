@@ -807,7 +807,7 @@ void AOOption::apply()
 
 void GuiScaleOption::apply()
 {
-	m_pMinecraft->sizeUpdate(Minecraft::width, Minecraft::height);
+	m_pMinecraft->sizeUpdate();
 }
 
 void GammaOption::apply()
@@ -881,14 +881,14 @@ void SwapJumpSneakOption::apply()
 {
 	if (!m_pMinecraft || !m_pMinecraft->m_pInputHolder)
 		return;
-	m_pMinecraft->m_pInputHolder->setScreenSize(Minecraft::width, Minecraft::height);
+	m_pMinecraft->m_pInputHolder->setScreenSize(Minecraft::GetViewportSize());
 }
 
 void DpadSizeOption::apply()
 {
 	if (!m_pMinecraft || !m_pMinecraft->m_pInputHolder)
 		return;
-	m_pMinecraft->m_pInputHolder->setScreenSize(Minecraft::width, Minecraft::height);
+	m_pMinecraft->m_pInputHolder->setScreenSize(Minecraft::GetViewportSize());
 }
 
 std::string HUDSizeOption::getDisplayValue() const
@@ -900,7 +900,7 @@ void UIThemeOption::apply()
 {
 	Minecraft& mc = *m_pMinecraft;
 
-	if (mc.getOptions() && mc.getOptions()->m_logoType.get() == LOGO_AUTO)
+	if (mc.getOptions())
 	{
 		mc.getOptions()->m_logoType.apply();
 	}

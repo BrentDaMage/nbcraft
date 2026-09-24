@@ -122,6 +122,7 @@ public:
 	virtual void checkForPointerEvent(MouseButtonType button);
 	virtual bool handleBackEvent(bool b);
 	virtual void onClose();
+	virtual void handleRawPointerLocation(unsigned int x, unsigned int y);
 	virtual void handlePointerLocation(MenuPointer::Unit x, MenuPointer::Unit y);
 	virtual void handlePointerPressed(bool isPressed);
 	virtual void handlePointerAction(const MenuPointer& pointer, MouseButtonType button);

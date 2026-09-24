@@ -20,10 +20,10 @@ class Entity;
 class UnifiedTurnBuild : public ITurnInput, public IBuildInput
 {
 public:
-	UnifiedTurnBuild(int, int width, int height, float, float, IInputHolder*);
+	UnifiedTurnBuild(int, const ViewportSize& size, float, float, IInputHolder*);
 
 	// ITurnInput
-	void setScreenSize(int width, int height) override; // actually IBuildInput also has it
+	void setScreenSize(const ViewportSize& size) override; // actually IBuildInput also has it
 	Vec2 getTurnDelta() override;
 	bool smoothTurning() override;
 

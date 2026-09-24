@@ -69,6 +69,17 @@ void ChatScreen::handleUserAction(const ActionInfo& button)
 	Screen::handleUserAction(button);
 }
 
+void ChatScreen::handleTextChar(char chr)
+{
+    if (chr == 0x0D)
+    {
+        sendMessageAndExit();
+        return;
+    }
+    
+    Screen::handleTextChar(chr);
+}
+
 void ChatScreen::handleKeyboardClosed()
 {
 	if (_useController())

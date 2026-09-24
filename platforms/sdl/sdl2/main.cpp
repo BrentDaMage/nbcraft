@@ -23,8 +23,6 @@ typedef AppPlatform_sdl2_desktop UsedAppPlatform;
 // Video Mode Flags
 #define VIDEO_FLAGS (SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI)
 
-static float g_fPointToPixelScale = 1.0f;
-
 NinecraftApp *g_pApp;
 
 SDL_Window *window = NULL;
@@ -222,11 +220,10 @@ static void handle_events()
 			{
 				if (event.button.which != SDL_TOUCH_MOUSEID)
 				{
-					const float scale = g_fPointToPixelScale;
 					MouseButtonType type = UsedAppPlatform::GetMouseButtonType(event.button.button);
 					bool state = UsedAppPlatform::GetMouseButtonState(event);
-					float x = event.button.x * scale;
-					float y = event.button.y * scale;
+					float x = event.button.x;
+					float y = event.button.y;
 					Mouse::feed(type, state, x, y);
 					if (getPlatform()->isTouchscreen())
 						Multitouch::feed(type, state, x, y, 0);
@@ -237,13 +234,12 @@ static void handle_events()
 			{
 				if (event.button.which != SDL_TOUCH_MOUSEID)
 				{
-					float scale = g_fPointToPixelScale;
-					float x = event.motion.x * scale;
-					float y = event.motion.y * scale;
+					float x = event.motion.x;
+					float y = event.motion.y;
 					if (getPlatform()->isTouchscreen())
 						Multitouch::feed(MOUSE_BUTTON_NONE, false, x, y, 0);
 					Mouse::feed(MOUSE_BUTTON_NONE, false, x, y);
-					getPlatform()->setMouseDiff(event.motion.xrel * scale, event.motion.yrel * scale);
+					getPlatform()->setMouseDiff(event.motion.xrel, event.motion.yrel);
 				}
 				break;
 			}
@@ -262,8 +258,8 @@ static void handle_events()
 			case SDL_FINGERUP:
 			case SDL_FINGERMOTION:
 			{
-				float x = event.tfinger.x * Minecraft::width;
-				float y = event.tfinger.y * Minecraft::height;
+				float x = event.tfinger.x * Minecraft::GetWidthP();
+				float y = event.tfinger.y * Minecraft::GetHeightP();
 				handle_touch(x, y, event.type, get_touch_id(event.tfinger.touchId, event.tfinger.fingerId));
 				break;
 			}
@@ -294,6 +290,24 @@ static void handle_events()
 				}
 				break;
 			}
+			case SDL_APP_TERMINATING:
+				getPlatform()->_fireAppTerminated();
+				break;
+			case SDL_APP_LOWMEMORY:
+				getPlatform()->_fireLowMemory();
+				break;
+			case SDL_APP_WILLENTERBACKGROUND:
+				getPlatform()->_fireAppFocusLost();
+				break;
+			case SDL_APP_DIDENTERBACKGROUND:
+				getPlatform()->_fireAppSuspended();
+				break;
+			case SDL_APP_WILLENTERFOREGROUND:
+				getPlatform()->_fireAppResumed();
+				break;
+			case SDL_APP_DIDENTERFOREGROUND:
+				getPlatform()->_fireAppFocusGained();
+				break;
 			case SDL_QUIT:
 			{
 				g_pApp->quit();
@@ -315,22 +329,12 @@ static void resize()
 	int windowWidth, windowHeight;
 	SDL_GetWindowSize(window,
 		&windowWidth, &windowHeight);
+
+	Minecraft::SetViewportSize(drawWidth, drawHeight, windowWidth, windowHeight);
 	
-	Minecraft::width  = drawWidth;
-	Minecraft::height = drawHeight;
-	
-	// recalculate the point to pixel scale.
-	// This currently assumes that the aspect ratio is the same.
-	g_fPointToPixelScale = float(drawWidth) / float(windowWidth);
-	
-	// Update the scale multiplier. We use the same value, because we pass to `sizeUpdate`, the window width/height.
-	// They will be multiplied by the GUI scale multiplier, becoming the drawwidth and drawheight, times the decided on GUI scale.
-	Minecraft::SetRenderScaleMultiplier(g_fPointToPixelScale);
-	
-	// give it an update.
-	// As said before, internally, this multiplies by the GUI scale multiplier
+	// Internally, this multiplies by the GUI scale multiplier
 	if (g_pApp)
-		g_pApp->sizeUpdate(windowWidth, windowHeight);
+		g_pApp->sizeUpdate();
 }
 
 // Main Loop
@@ -388,12 +392,11 @@ int main(int argc, char *argv[])
 
 	// Window Size
 #ifdef __EMSCRIPTEN__
-	Minecraft::width = std::stoi(argv[1]);
-	Minecraft::height = std::stoi(argv[2]);
+	Minecraft::SetViewportSize(std::stoi(argv[1]), std::stoi(argv[2]));
 #endif
 
 	// Create Window
-	window = SDL_CreateWindow(C_GAME_NAME, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, Minecraft::width, Minecraft::height, VIDEO_FLAGS);
+	window = SDL_CreateWindow(C_GAME_NAME, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, Minecraft::GetWidthL(), Minecraft::GetHeightL(), VIDEO_FLAGS);
 	if (!window)
 	{
 		LOG_E("Unable to create SDL window: %s", SDL_GetError());
@@ -447,6 +450,8 @@ int main(int argc, char *argv[])
 	
 	// Set Size
 	resize();
+
+	g_pApp->start();
 
 	// Loop
 #ifndef __EMSCRIPTEN__

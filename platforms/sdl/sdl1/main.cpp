@@ -37,8 +37,6 @@ const Uint32 VIDEO_FLAGS = 0x0
 #endif
 ;
 
-static float g_fPointToPixelScale = 1.0f;
-
 NinecraftApp* g_pApp;
 
 SDL_Surface* screen = NULL;
@@ -179,7 +177,7 @@ static void handle_events()
             case SDL_MOUSEBUTTONDOWN:
                 if (event.button.button == SDL_BUTTON_WHEELUP)
                 {
-                    const float scale = g_fPointToPixelScale;
+                    const float scale = Minecraft::GetRenderScaleMultiplier();
                     float x = event.button.x * scale;
                     float y = event.button.y * scale;
                     Mouse::feed(MOUSE_BUTTON_SCROLLWHEEL, false, x, y);
@@ -187,7 +185,7 @@ static void handle_events()
                 }
                 else if (event.button.button == SDL_BUTTON_WHEELDOWN)
                 {
-                    const float scale = g_fPointToPixelScale;
+                    const float scale = Minecraft::GetRenderScaleMultiplier();
                     float x = event.button.x * scale;
                     float y = event.button.y * scale;
                     Mouse::feed(MOUSE_BUTTON_SCROLLWHEEL, true, x, y);
@@ -196,7 +194,7 @@ static void handle_events()
                 // fall through
             case SDL_MOUSEBUTTONUP:
             {
-                const float scale = g_fPointToPixelScale;
+                const float scale = Minecraft::GetRenderScaleMultiplier();
                 MouseButtonType type = UsedAppPlatform::GetMouseButtonType(event.button.button);
                 bool state = UsedAppPlatform::GetMouseButtonState(event);
                 float x = event.button.x * scale;
@@ -206,7 +204,7 @@ static void handle_events()
             }
             case SDL_MOUSEMOTION:
             {
-                float scale = g_fPointToPixelScale;
+                float scale = Minecraft::GetRenderScaleMultiplier();
                 float x = event.motion.x * scale;
                 float y = event.motion.y * scale;
                 Mouse::feed(MOUSE_BUTTON_NONE, false, x, y);
@@ -235,15 +233,10 @@ static void handle_events()
 // Resizing
 static void resize()
 {
-    Minecraft::width  = screen->w;
-    Minecraft::height = screen->h;
-
-    g_fPointToPixelScale = float(screen->w) / float(screen->w);
-
-    Minecraft::SetRenderScaleMultiplier(g_fPointToPixelScale);
+    Minecraft::SetViewportSize(screen->w, screen->h);
 
     if (g_pApp)
-        g_pApp->sizeUpdate(screen->w, screen->h);
+        g_pApp->sizeUpdate();
 }
 
 // Main Loop
@@ -295,7 +288,7 @@ int main(int argc, char* argv[])
     //LOG_I("Setting SDL video mode...");
     // XENON: width and height need to be accurate to what's already set by the console,
     // or else libXenon will crash.
-    screen = SDL_SetVideoMode(Minecraft::width, Minecraft::height, 0, VIDEO_FLAGS);
+    screen = SDL_SetVideoMode(Minecraft::GetWidthL(), Minecraft::GetHeightL(), 0, VIDEO_FLAGS);
     if (!screen)
     {
         LOG_E("Failed to set SDL video mode: %s", SDL_GetError());
@@ -322,7 +315,11 @@ int main(int argc, char* argv[])
     g_pApp = new NinecraftApp;
     g_pApp->init();
 
+    // Set Size
     resize();
+
+    g_pApp->start();
+
     // We're off to the races
     while (true)
     {

@@ -13,7 +13,7 @@
 
 TouchInputHolder::TouchInputHolder(Minecraft* pMinecraft, Options* pOptions) :
 	m_touchScreenInput(pMinecraft, pOptions),
-	m_unifiedTurnBuild(2, Minecraft::width, Minecraft::height, 200.0f, 1.05f, this),
+	m_unifiedTurnBuild(2, Minecraft::GetViewportSize(), 200.0f, 1.05f, this),
 	m_pMinecraft(pMinecraft)
 {
 }
@@ -59,13 +59,13 @@ IBuildInput* TouchInputHolder::getBuildInput()
 	return &m_unifiedTurnBuild;
 }
 
-void TouchInputHolder::setScreenSize(int width, int height)
+void TouchInputHolder::setScreenSize(const ViewportSize& size)
 {
-	m_touchScreenInput.setScreenSize(width, height);
+	m_touchScreenInput.setScreenSize(size);
 	m_unifiedTurnBuild.field_40 = m_touchScreenInput.getRectangleArea();
 	m_unifiedTurnBuild.m_sneakExclude = m_touchScreenInput.getSneakArea();
 	m_unifiedTurnBuild.field_58 = m_pMinecraft->m_pGui->getRectangleArea(false);
-	m_unifiedTurnBuild.setScreenSize(width, height);
+	m_unifiedTurnBuild.setScreenSize(size);
 #ifdef ENH_NEW_TOUCH_CONTROLS
 	m_touchScreenInput.setSneakExcludeRef(&m_unifiedTurnBuild.m_sneakExclude);
 #endif

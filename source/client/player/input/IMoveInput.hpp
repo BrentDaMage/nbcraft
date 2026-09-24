@@ -9,7 +9,7 @@
 #pragma once
 
 #include "compat/LegacyCPP.hpp"
-
+#include "client/gui/ViewportSize.hpp"
 #include "client/options/Options.hpp"
 
 class Player;
@@ -37,7 +37,7 @@ public:
 	virtual void releaseAllKeys();
 	virtual void render(float f);
 	virtual void setKey(UserActionID, bool eventKeyState);
-	virtual void setScreenSize(int width, int height);
+	virtual void setScreenSize(const ViewportSize& size);
 	virtual void tick(Player*);
 
 public:

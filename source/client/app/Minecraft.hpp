@@ -9,12 +9,14 @@
 #pragma once
 
 #include "App.hpp"
+#include "VirtualKeyboardManager.hpp"
 #include "common/threading/CThread.hpp"
 #include "common/Mth.hpp"
 #include "common/Timer.hpp"
 #include "client/gui/Gui.hpp"
 #include "client/gui/Screen.hpp"
 #include "client/gui/ScreenChooser.hpp"
+#include "client/gui/ViewportSize.hpp"
 #include "network/RakNetInstance.hpp"
 #include "network/NetEventCallback.hpp"
 #include "client/player/input/IInputHolder.hpp"
@@ -95,13 +97,13 @@ public:
 
 	void update() override;
 	void init() override;
-	void sizeUpdate(int newWidth, int newHeight) override;
+	void sizeUpdate() override;
 	void setTextboxText(const std::string& text) override;
 
 	virtual void reloadFancy(bool isFancy);
 	virtual int getFpsIntlCounter();
 
-	float getBestScaleForThisScreenSize(int width, int height);
+	float getBestScaleForThisScreenSize(unsigned int width, unsigned int height);
 	void setupLevelRendering(Level* pLevel, Dimension* pDimension, Mob* pCamera);
 	void onClientStartedLevel(Level* pLevel, LocalPlayer* pLocalPlayer);
 	void generateLevel(const std::string& unused, Level& level);
@@ -119,21 +121,31 @@ public:
 	UITheme getUiTheme();
 	//const Entity& getCameraEntity() const { return *m_pCameraEntity; }
 
-private:
-	static Minecraft* _singletonPtr;
-    // Value provided by the OS
-    static float _renderScaleMultiplier;
-	static InputMethod::Type _inputMethod;
-
 public:
 	static Minecraft& singleton() { return *_singletonPtr; }
+
+	static unsigned int GetWidthP()   { return _viewportSize.physical.width; }
+	static unsigned int GetHeightP()  { return _viewportSize.physical.height; }
+	static unsigned int GetWidthL()   { return _viewportSize.logical.width; }
+	static unsigned int GetHeightL()  { return _viewportSize.logical.height; }
+    static const ViewportSize& GetViewportSize() { return _viewportSize; }
+	static void SetViewportSize(unsigned int physicalWidth, unsigned int physicalHeight);
+	static void SetViewportSize(unsigned int physicalWidth, unsigned int physicalHeight, unsigned int logicalWidth, unsigned int logicalHeight);
+
     static float GetRenderScaleMultiplier() { return _renderScaleMultiplier; }
     static void SetRenderScaleMultiplier(float value) { _renderScaleMultiplier = value; }
+
 	static InputMethod::Type GetInputMethod() { return _inputMethod; }
 	static void SetInputMethod(InputMethod::Type inputType) { _inputMethod = inputType; }
     
+private:
+	static Minecraft* _singletonPtr;
+	// Value provided by the OS
+	static float _renderScaleMultiplier;
+	static ViewportSize _viewportSize;
+	static InputMethod::Type _inputMethod;
+
 public:
-	static int width, height;
 	static bool useAmbientOcclusion;
 	static const char* progressMessages[];
 	static const bool DEADMAU5_CAMERA_CHEATS;
@@ -170,6 +182,7 @@ public:
 	int field_D18;
 	IInputHolder* m_pInputHolder;
 	MouseHandler m_mouseHandler;
+    VirtualKeyboardManager m_virtualKeyboardManager;
 	bool m_bGrabbedMouse;
 	bool m_bIsTouchscreen;
 	HitResult m_hitResult;

@@ -42,6 +42,7 @@ public:
 	// Also add these to allow proper text input within the game.
 	bool shiftPressed() override;
 	void setShiftPressed(bool b);
+    bool hasVirtualKeyboard() const override;
 	void showKeyboard(LocalPlayerID playerId, const VirtualKeyboard& keyboard) override;
 	void hideKeyboard(LocalPlayerID playerId) override;
 	unsigned int getKeyboardUpOffset() const override;

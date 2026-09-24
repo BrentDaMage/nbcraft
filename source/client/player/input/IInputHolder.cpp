@@ -27,11 +27,11 @@ bool IInputHolder::allowPicking()
 	return Mouse::getButtonState(MOUSE_BUTTON_LEFT);
 }
 
-void IInputHolder::setScreenSize(int width, int height)
+void IInputHolder::setScreenSize(const ViewportSize& size)
 {
-	getMoveInput()->setScreenSize(width, height);
-	getTurnInput()->setScreenSize(width, height);
-	getBuildInput()->setScreenSize(width, height);
+	getMoveInput()->setScreenSize(size);
+	getTurnInput()->setScreenSize(size);
+	getBuildInput()->setScreenSize(size);
 }
 
 bool IInputHolder::allowsInputMethod(InputMethod::Type type) const

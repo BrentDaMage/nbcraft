@@ -36,6 +36,8 @@ public:
 
 private:
 	std::string _sanitizePasteText(const std::string& text) const;
+	void _selectMe();
+	void _deselectMe();
 
 public:
 	void init(Font* pFont);

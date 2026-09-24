@@ -208,6 +208,11 @@ bool AppPlatform::shiftPressed()
 	return false;
 }
 
+bool AppPlatform::hasVirtualKeyboard() const
+{
+    return false;
+}
+
 void AppPlatform::showKeyboard(LocalPlayerID playerId, const VirtualKeyboard& keyboard)
 {
 }

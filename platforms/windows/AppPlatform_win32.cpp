@@ -174,7 +174,7 @@ AssetFile AppPlatform_win32::readAssetFile(const std::string& path, bool quiet) 
 	return AssetFile(size, buffer);
 }
 
-void AppPlatform_win32::setScreenSize(int width, int height)
+void AppPlatform_win32::setScreenSize(unsigned int width, unsigned int height)
 {
 	m_ScreenWidth = width;
 	m_ScreenHeight = height;

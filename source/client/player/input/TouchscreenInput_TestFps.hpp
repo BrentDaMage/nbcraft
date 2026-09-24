@@ -25,7 +25,7 @@ public:
 	// IMoveInput
 	void releaseAllKeys() override;
 	void setKey(UserActionID, bool eventKeyState) override;
-	void setScreenSize(int width, int height) override;
+	void setScreenSize(const ViewportSize& size) override;
 	void tick(Player*) override;
 	void render(float f) override;
 

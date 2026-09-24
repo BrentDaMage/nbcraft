@@ -233,7 +233,7 @@ float Screen::getScale(int width, int height)
 
 float Screen::GetConsoleScale(int height)
 {
-	return 1.0f / float(Mth::round((Mth::round(height / 180.0f) * 180) / 360.0f) / 2.0f);
+	return float(Mth::round((Mth::round(height / 180.0f) * 180) / 360.0f) / 2.0f);
 }
 
 void Screen::setTextboxText(const std::string& text)
@@ -415,25 +415,6 @@ void Screen::pointerPressed(const MenuPointer& pointer, MouseButtonType btn)
 			}
 		}
 	}
-
-#ifndef ORIGINAL_CODE
-	// @TODO: old code? why is this only doing this for Android? how does this work on iOS?
-#ifdef USE_NATIVE_ANDROID
-	// if the keyboard is shown:
-	if (AppPlatform::singleton()->getKeyboardUpOffset())
-	{
-		// if there are none focused at the moment:
-		bool areAnyFocused = false;
-		
-		GuiElement* element = _getSelectedElement();
-		if (element && element->getType() == GuiElement::TYPE_TEXTBOX)
-			areAnyFocused = true;
-
-		if (!areAnyFocused)
-			AppPlatform::singleton()->hideKeyboard(0);
-	}
-#endif
-#endif
 }
 
 void Screen::pointerReleased(const MenuPointer& pointer, MouseButtonType btn)
@@ -582,9 +563,8 @@ bool Screen::prevTab()
 
 int Screen::getYOffset()
 {
-#ifdef USE_NATIVE_ANDROID
 	int keybOffset = AppPlatform::singleton()->getKeyboardUpOffset();
-	if (!keybOffset)
+	if (keybOffset == 0)
 		return 0;
 
 	int offset = 0;
@@ -592,27 +572,20 @@ int Screen::getYOffset()
 	GuiElement* element = _getSelectedElement();
 	if (element && element->getType() == GuiElement::TYPE_TEXTBOX)
 	{
-		int heightLeft = m_height - int(float(keybOffset) * Gui::GuiScale);
+		int heightLeft = m_height - int(float(keybOffset) / Minecraft::GetRenderScaleMultiplier() * Gui::GuiScale);
 
 		// we want to keep the center of the text box in the center of the screen
-		int textCenterY = element->m_yPos + element->m_height / 2;
+		int textCenterY = element->m_yPos + (element->m_height / 2);
 		int scrnCenterY = heightLeft / 2;
-
-		int diff = textCenterY - scrnCenterY;
-
+        
 		// Prevent the difference from revealing the outside of the screen.
-		if (diff > m_height - heightLeft)
-			diff = m_height - heightLeft;
-		if (diff < 0)
-			diff = 0;
+		int diff = textCenterY - scrnCenterY;
+        diff = Mth::clamp(diff, 0, m_height - heightLeft + 1); // +1 to fix the chat textbox cutoff
 
 		offset = diff;
 	}
 
 	return offset;
-#else
-	return 0;
-#endif
 }
 
 bool Screen::doElementTabbing() const
@@ -756,7 +729,7 @@ void Screen::mouseEvent()
 	MouseAction* pAction = Mouse::getEvent();
 	if (pAction->isButton())
 	{
-		handlePointerLocation(m_width * pAction->_posX / Minecraft::width, m_height * pAction->_posY / Minecraft::height - 1 + getYOffset());
+		handleRawPointerLocation(pAction->_posX, pAction->_posY);
 		handlePointerPressed(Mouse::getEventButtonState());
 
 		checkForPointerEvent(Mouse::getEventButton());
@@ -817,6 +790,15 @@ bool Screen::handleBackEvent(bool b)
 	return false;
 }
 
+void Screen::handleRawPointerLocation(unsigned int x, unsigned int y)
+{
+	x = m_width  * x / Minecraft::GetWidthL();
+	y = m_height * y / Minecraft::GetHeightL();
+	y += m_yOffset;
+
+	handlePointerLocation(x, y);
+}
+
 void Screen::handlePointerLocation(MenuPointer::Unit x, MenuPointer::Unit y)
 {
 	m_menuPointer.x = Mth::clamp(x, 0.0f, float(m_width));
@@ -832,13 +814,11 @@ void Screen::handlePointerAction(const MenuPointer& pointer, MouseButtonType but
 {
 	if (pointer.isPressed)
 	{
-		// pointerPressed(m_width * pAction->_posX / Minecraft::width, m_height * pAction->_posY / Minecraft::height - 1 + getYOffset(), Mouse::getEventButton());
-		pointerPressed(MenuPointer(pointer.x, pointer.y + getYOffset()), button);
+		pointerPressed(MenuPointer(pointer.x, pointer.y), button);
 	}
 	else
 	{
-		// pointerReleased(m_width * pAction->_posX / Minecraft::width, m_height * pAction->_posY / Minecraft::height - 1 + getYOffset(), Mouse::getEventButton());
-		pointerReleased(MenuPointer(pointer.x, pointer.y + getYOffset()), button);
+		pointerReleased(MenuPointer(pointer.x, pointer.y), button);
 	}
 }
 

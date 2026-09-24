@@ -123,7 +123,7 @@ void GameRenderer::_clearFrameBuffer()
 {
 	mce::RenderContext& renderContext = mce::RenderContextImmediate::get();
 
-	renderContext.setViewport(Minecraft::width, Minecraft::height, 0.0f, 0.7f);
+	renderContext.setViewport(Minecraft::GetWidthP(), Minecraft::GetHeightP(), 0.0f, 0.7f);
 	renderContext.setRenderTarget();
 	renderContext.clearFrameBuffer(Color(0.0f, 0.3f, 0.2f, 0.0f));
 	renderContext.clearDepthStencilBuffer();
@@ -134,7 +134,7 @@ void GameRenderer::_renderItemInHand(float f, int i)
 #ifdef ENH_FOV_MODIFIER
 	MatrixStack::Ref projRef = MatrixStack::Projection.pushIdentity();
 	float fov = getFov(f, false);
-	projRef->setPerspective(fov, float(Minecraft::width) / float(Minecraft::height), 0.05f, m_renderDistance * 1.2f);
+	projRef->setPerspective(fov, float(Minecraft::GetWidthP()) / float(Minecraft::GetHeightP()), 0.05f, m_renderDistance * 1.2f);
 #endif
 
 	Matrix& viewMtx = MatrixStack::View.getTop();
@@ -315,9 +315,9 @@ void GameRenderer::setupCamera(float f, int i)
 
 	float fov = getFov(f);
 	// Java
-	//projMtx.setPerspective(fov, float(Minecraft::width) / float(Minecraft::height), 0.05f, m_renderDistance);
+	//projMtx.setPerspective(fov, float(Minecraft::GetWidthP()) / float(Minecraft::GetHeightP()), 0.05f, m_renderDistance);
 	// PE (0.12.1)
-	projMtx.setPerspective(fov, float(Minecraft::width) / float(Minecraft::height), 0.05f, m_renderDistance * 1.2f);
+	projMtx.setPerspective(fov, float(Minecraft::GetWidthP()) / float(Minecraft::GetHeightP()), 0.05f, m_renderDistance * 1.2f);
 
 	Matrix& viewMtx = MatrixStack::View.getTop();
 	viewMtx = Matrix::IDENTITY;
@@ -566,7 +566,7 @@ void GameRenderer::renderLevel(float f)
 #endif
 		}
 
-		renderContext.setViewport(Minecraft::width, Minecraft::height, 0.0f, 0.7f);
+		renderContext.setViewport(Minecraft::GetWidthP(), Minecraft::GetHeightP(), 0.0f, 0.7f);
 		renderContext.setRenderTarget();
 		const Color& clearColor = levelRenderer.setupClearColor(f);
 		renderContext.clearFrameBuffer(clearColor);
@@ -688,8 +688,7 @@ void GameRenderer::render(const Timer& timer)
 		pMC->m_pLocalPlayer->turn(rot);
 	}
 
-	int mouseX = -9999;
-	int mouseY = -9999;
+	Vec2 mousePos; // logical, not physical
 	bool bMouseData = false;
 
 	if (m_pMinecraft->useTouchscreen())
@@ -697,8 +696,8 @@ void GameRenderer::render(const Timer& timer)
 		int pointerId = Multitouch::getFirstActivePointerIdExThisUpdate();
 		if (pointerId >= 0)
 		{
-			mouseX = int(float(Multitouch::getX(pointerId)) * Gui::GuiScale);
-			mouseY = int(float(Multitouch::getY(pointerId)) * Gui::GuiScale);
+			mousePos.x = Multitouch::getX(pointerId);
+			mousePos.y = Multitouch::getY(pointerId);
 			bMouseData = true;
 		}
 	}
@@ -711,8 +710,8 @@ void GameRenderer::render(const Timer& timer)
 	}
 	else
 	{
-		mouseX = int(Mouse::getX() * Gui::GuiScale);
-		mouseY = int(Mouse::getY() * Gui::GuiScale);
+		mousePos.x = Mouse::getX();
+		mousePos.y = Mouse::getY();
 		bMouseData = true;
 	}
 
@@ -754,7 +753,7 @@ void GameRenderer::render(const Timer& timer)
 		mce::RenderContextImmediate::get().clearDepthStencilBuffer();
 		if (bMouseData)
 		{
-			pScreen->handlePointerLocation(mouseX, mouseY);
+			pScreen->handleRawPointerLocation(mousePos.x, mousePos.y);
 			pScreen->handlePointerPressed(Mouse::getButtonState(MOUSE_BUTTON_LEFT));
 		}
 		pScreen->onRender(timer.m_partialTicks);
@@ -983,12 +982,12 @@ void GameRenderer::pick(float f)
 		if (m_pMinecraft->m_pInputHolder->allowPicking())
 		{
 			int viewport[4] = { 0 };
-			viewport[2] = Minecraft::width;
-			viewport[3] = Minecraft::height;
+			viewport[2] = Minecraft::GetWidthL();
+			viewport[3] = Minecraft::GetHeightL();
 			float obj_coord[3] = { 0 };
 
 			if (glhUnProjectf(m_pMinecraft->m_pInputHolder->m_feedbackX,
-				              Minecraft::height - m_pMinecraft->m_pInputHolder->m_feedbackY,
+				              Minecraft::GetHeightL() - m_pMinecraft->m_pInputHolder->m_feedbackY,
 				              1.0f,
 				              m_mtxView.ptr(),
 				              m_mtxProj.ptr(),
@@ -998,7 +997,7 @@ void GameRenderer::pick(float f)
 				foundPosFar = mobPos + Vec3(obj_coord[0], obj_coord[1], obj_coord[2]);
 
 				glhUnProjectf(m_pMinecraft->m_pInputHolder->m_feedbackX,
-				              Minecraft::height - m_pMinecraft->m_pInputHolder->m_feedbackY,
+				              Minecraft::GetHeightL() - m_pMinecraft->m_pInputHolder->m_feedbackY,
 				              0.0f,
 				              m_mtxView.ptr(),
 				              m_mtxProj.ptr(),

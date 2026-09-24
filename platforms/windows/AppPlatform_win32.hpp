@@ -64,7 +64,7 @@ public:
 	// Also add this to allow dynamic texture patching.
 	AssetFile readAssetFile(const std::string&, bool) const override;
 
-	void setScreenSize(int width, int height);
+	void setScreenSize(unsigned int width, unsigned int height);
 	const char* getWindowTitle() const { return m_WindowTitle; }
 	SoundSystem* getSoundSystem() const override { return m_pSoundSystem; }
 

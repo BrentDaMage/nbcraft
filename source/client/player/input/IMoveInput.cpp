@@ -34,7 +34,7 @@ void IMoveInput::setKey(UserActionID, bool eventKeyState)
 {
 }
 
-void IMoveInput::setScreenSize(int width, int height)
+void IMoveInput::setScreenSize(const ViewportSize& size)
 {
 }
 

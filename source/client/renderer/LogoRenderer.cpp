@@ -57,7 +57,15 @@ void LogoRenderer::build(int width)
 
 void LogoRenderer::build()
 {
-	_build2dTitleMesh();
+    Options& options = *m_pMinecraft->getOptions();
+    if (options.getLogoType() == LOGO_3D)
+    {
+        _build3dTitleMesh();
+    }
+    else
+    {
+        _build2dTitleMesh();
+    }
 }
 
 void LogoRenderer::tick()
@@ -126,7 +134,7 @@ void LogoRenderer::_build2dTitleMesh()
 	if (!pTex)
 		return;
 
-	UITheme uiTheme = m_pMinecraft->getUiTheme();
+	UITheme uiTheme = options.getUiTheme(); // we were doing the current Screen's theme here, but that'd break the logo rebuild
 	bool isPocket = uiTheme == UI_POCKET;
 	bool isConsole = uiTheme == UI_CONSOLE;
 
@@ -155,18 +163,18 @@ void LogoRenderer::_build2dTitleMesh()
 
 		left = (m_width - width) / 2;
 
-		if (m_width * 3 / 4 < m_2dTitleBounds.w)
+		if (m_width * 3 / 4 < width)
 		{
 			// crampedMode = true;
 			yPos = 4;
 		}
 
-		m_2dTitleBounds.x = left;
-		m_2dTitleBounds.y = yPos;
-		m_2dTitleBounds.w = width;
-		m_2dTitleBounds.h = height;
+		m_titleBounds.x = left;
+		m_titleBounds.y = yPos;
+		m_titleBounds.w = width;
+		m_titleBounds.h = height;
 
-		blit(m_2dTitleMesh, m_2dTitleBounds);
+		blit(m_2dTitleMesh, m_titleBounds);
 		break;
 	}
 	case LOGO_JAVA:
@@ -193,11 +201,16 @@ void LogoRenderer::_build2dTitleMesh()
 
 		left = m_width / 2 - width / 2;
 
-		if (m_width * 3 / 4 < m_2dTitleBounds.w)
+		if (m_width * 3 / 4 < width)
 		{
 			// crampedMode = true;
 			yPos = 4;
 		}
+        
+        m_titleBounds.x = left;
+		m_titleBounds.y = yPos;
+		m_titleBounds.w = width;
+		m_titleBounds.h = height;
 
 		Tesselator& t = Tesselator::instance;
 		t.begin(8);
@@ -236,18 +249,25 @@ void LogoRenderer::_build2dTitleMesh()
 
 		left = (m_width - width) / 2;
 
+		m_titleBounds.x = left;
+		m_titleBounds.y = yPos;
+		m_titleBounds.w = width;
+		m_titleBounds.h = height;
 
-		m_2dTitleBounds.x = left;
-		m_2dTitleBounds.y = yPos;
-		m_2dTitleBounds.w = width;
-		m_2dTitleBounds.h = height;
-
-		blit(m_2dTitleMesh, m_2dTitleBounds);
+		blit(m_2dTitleMesh, m_titleBounds);
 		break;
 	}
 	default:
 		break;
 	}
+}
+
+void LogoRenderer::_build3dTitleMesh()
+{
+    m_titleBounds.x = 0;
+    m_titleBounds.y = 0;
+    m_titleBounds.w = Gui::GuiWidth;
+    m_titleBounds.h = Gui::GuiHeight / 3;
 }
 
 void LogoRenderer::render2d()
@@ -286,7 +306,7 @@ void LogoRenderer::render3d(float f)
 		titleHeight *= 2;
 
 	MatrixStack::Ref projMtx = MatrixStack::Projection.pushIdentity();
-	projMtx->setPerspective(70.0f, float(Minecraft::width) / titleHeight, 0.05f, 100.0f);
+	projMtx->setPerspective(70.0f, float(Minecraft::GetWidthP()) / titleHeight, 0.05f, 100.0f);
 
 	int yOffset = 0;
 	if (isPocket)
@@ -298,10 +318,10 @@ void LogoRenderer::render3d(float f)
 	mce::ViewportOrigin viewportOrigin;
 	{
 		viewportOrigin.leftX = 0;
-		viewportOrigin.bottomLeftY = Minecraft::height - titleHeight + yOffset;
+		viewportOrigin.bottomLeftY = Minecraft::GetHeightP() - titleHeight + yOffset;
 		viewportOrigin.topLeftY = -yOffset;
 	}
-	renderContext.setViewport(Minecraft::width, titleHeight, 0.0f, 0.7f, viewportOrigin);
+	renderContext.setViewport(Minecraft::GetWidthP(), titleHeight, 0.0f, 0.7f, viewportOrigin);
 
 	MatrixStack::Ref viewMtx = MatrixStack::View.pushIdentity();
 
@@ -392,7 +412,7 @@ void LogoRenderer::render3d(float f)
 		}
 	}
 
-	renderContext.setViewport(Minecraft::width, Minecraft::height, 0.0f, 0.7f);
+	renderContext.setViewport(Minecraft::GetWidthP(), Minecraft::GetHeightP(), 0.0f, 0.7f);
 }
 
 Tile* TitleTile::_tiles[3];

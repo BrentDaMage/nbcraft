@@ -101,6 +101,7 @@ public:
 	virtual bool controlPressed();
 	virtual bool shiftPressed();
 	// On-screen keyboard
+    virtual bool hasVirtualKeyboard() const;
 	virtual void showKeyboard(LocalPlayerID playerId, const VirtualKeyboard& keyboard);
 	virtual void hideKeyboard(LocalPlayerID playerId);
 	virtual void onHideKeyboard(); // called by the runner, not the game

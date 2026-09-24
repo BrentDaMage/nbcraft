@@ -38,8 +38,8 @@ float Gui::GuiScale = 1.0f / 2.0f;
 #else
 float Gui::GuiScale = 1.0f / 3.0f;
 #endif
-int Gui::GuiWidth = Minecraft::width;
-int Gui::GuiHeight = Minecraft::height;
+int Gui::GuiWidth = Minecraft::GetWidthL();
+int Gui::GuiHeight = Minecraft::GetHeightL();
 
 bool Gui::_isVignetteAvailable = false; // false because PE never seemed to have it
 
@@ -364,7 +364,7 @@ void Gui::renderAnimatedCharacter(int x, int y, float partialTick)
 int Gui::getSlotIdAt(int mouseX, int mouseY)
 {
 	int scaledY = int(GuiScale * mouseY);
-	int scaledHeight = int(GuiScale * Minecraft::height);
+	int scaledHeight = int(GuiScale * Minecraft::GetHeightL());
 
 	if (scaledY >= scaledHeight)
 		return -1;
@@ -373,7 +373,7 @@ int Gui::getSlotIdAt(int mouseX, int mouseY)
 
 	int hotbarOffset = getNumSlots() * 20 / 2 - 2;
 
-	int slotX = (int(GuiScale * mouseX) - int(GuiScale * Minecraft::width) / 2 + hotbarOffset + 20) / 20;
+	int slotX = (int(GuiScale * mouseX) - int(GuiScale * Minecraft::GetWidthL()) / 2 + hotbarOffset + 20) / 20;
 
 	if (slotX >= 0)
 		slotX--;
@@ -958,11 +958,11 @@ int Gui::getNumUsableSlots()
 
 RectangleArea Gui::getRectangleArea(bool b)
 {
-	float centerX = Minecraft::width / 2;
+	float centerX = Minecraft::GetWidthL() / 2;
 	float hotbarWidthHalf = (10 * getNumSlots() + 5) / GuiScale;
 	return RectangleArea(
 		b ? (centerX - hotbarWidthHalf) : 0,
-		Minecraft::height - 24.0f / GuiScale,
+		Minecraft::GetHeightL() - 24.0f / GuiScale,
 		centerX + hotbarWidthHalf,
-		Minecraft::height);
+		Minecraft::GetHeightL());
 }

@@ -202,6 +202,11 @@ void AppPlatform_android::setShiftPressed(bool b)
 	m_bShiftPressed = b;
 }
 
+bool AppPlatform_android::hasVirtualKeyboard() const
+{
+    return true;
+}
+
 void AppPlatform_android::showKeyboard(LocalPlayerID playerId, const VirtualKeyboard& keyboard)
 {
 	changeKeyboardVisibility(true);
@@ -271,6 +276,9 @@ void AppPlatform_android::changeKeyboardVisibility(bool bShown)
 
 unsigned int AppPlatform_android::getKeyboardUpOffset() const
 {
+    if (!m_bIsKeyboardShown)
+        return 0;
+    
 	// @TODO
 	// For now we'll just return 1/2 of the screen height. That ought to cover most cases.
 	return m_ScreenHeight / 2;

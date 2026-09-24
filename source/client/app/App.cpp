@@ -25,7 +25,13 @@ bool App::handleBack(bool b)
 
 void App::init()
 {
+    m_bInited = true;
+}
 
+void App::start()
+{
+    if (!m_bInited)
+        init();
 }
 
 void App::loadState(void* a2, int a3)
@@ -53,7 +59,7 @@ void App::update()
 
 }
 
-void App::sizeUpdate(int newWidth, int newHeight)
+void App::sizeUpdate()
 {
 
 }

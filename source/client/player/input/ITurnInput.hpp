@@ -9,6 +9,7 @@
 #pragma once
 
 #include "compat/LegacyCPP.hpp"
+#include "client/gui/ViewportSize.hpp"
 #include "world/phys/Vec2.hpp"
 
 class ITurnInput
@@ -23,7 +24,7 @@ public:
 	float linearTransform(float, float, float, bool);
 
 	virtual ~ITurnInput();
-	virtual void setScreenSize(int width, int height);
+	virtual void setScreenSize(const ViewportSize& size);
 	virtual Vec2 getTurnDelta() = 0;
 	virtual bool smoothTurning();
 

@@ -50,9 +50,13 @@ void StartMenuScreen_Pocket::_setupPositions()
 	m_optionsButton->m_yPos = v5;
 	m_buyButton.m_yPos      = m_height - (m_buyButton.m_height + 4);
 
-	float v6 = ((float)m_width + ((float)startBtnWidth * -3.0f)) * 0.25f;
-	m_joinButton->m_xPos    = v6;
-	m_startButton->m_xPos   = (v6 * 2.0f) + startBtnWidth;
-	m_optionsButton->m_xPos = (v6 * 3.0f) + (startBtnWidth * 2);
-	m_buyButton.m_xPos      = (v6 * 2.0f) + startBtnWidth;
+	constexpr int columns = 3;
+
+	float v6 = ((float)m_width + ((float)startBtnWidth * -columns)) * 0.25f;
+	m_joinButton->m_xPos    = (v6 * 1);
+	m_startButton->m_xPos   = (v6 * 2) + startBtnWidth;
+	m_optionsButton->m_xPos = (v6 * 3) + (startBtnWidth * 2);
+	m_buyButton.m_xPos      = (v6 * 2) + startBtnWidth;
+    
+    _setupGenericPositions();
 }

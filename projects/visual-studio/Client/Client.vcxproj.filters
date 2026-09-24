@@ -773,6 +773,12 @@
     <ClInclude Include="$(MC_ROOT)\source\client\gui\screens\SavingWorldScreen_Console.hpp">
       <Filter>Header Files\GUI\Screens</Filter>
     </ClInclude>
+    <ClInclude Include="$(MC_ROOT)\source\client\gui\ViewportSize.hpp">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MC_ROOT)\source\client\app\VirtualKeyboardManager.hpp">
+      <Filter>Header Files\App</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MC_ROOT)\source\client\gui\components\AvailableGamesList.cpp">
@@ -1398,6 +1404,9 @@
     </ClCompile>
     <ClCompile Include="$(MC_ROOT)\source\client\gui\screens\SavingWorldScreen_Console.cpp">
       <Filter>Source Files\GUI\Screens</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MC_ROOT)\source\client\app\VirtualKeyboardManager.cpp">
+      <Filter>Source Files\App</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

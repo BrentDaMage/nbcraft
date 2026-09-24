@@ -291,6 +291,8 @@
     <ClInclude Include="$(MC_ROOT)\source\client\gui\screens\JoinGameScreen_Console.hpp" />
     <ClInclude Include="$(MC_ROOT)\source\client\gui\screens\LoadWorldScreen_Console.hpp" />
     <ClInclude Include="$(MC_ROOT)\source\client\gui\screens\SavingWorldScreen_Console.hpp" />
+    <ClInclude Include="$(MC_ROOT)\source\client\gui\ViewportSize.hpp" />
+    <ClInclude Include="$(MC_ROOT)\source\client\app\VirtualKeyboardManager.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MC_ROOT)\source\client\app\App.cpp" />
@@ -500,6 +502,7 @@
     <ClCompile Include="$(MC_ROOT)\source\client\gui\screens\JoinGameScreen_Console.cpp" />
     <ClCompile Include="$(MC_ROOT)\source\client\gui\screens\LoadWorldScreen_Console.cpp" />
     <ClCompile Include="$(MC_ROOT)\source\client\gui\screens\SavingWorldScreen_Console.cpp" />
+    <ClCompile Include="$(MC_ROOT)\source\client\app\VirtualKeyboardManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.vcxproj">

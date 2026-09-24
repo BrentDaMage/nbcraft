@@ -32,6 +32,7 @@ public:
 
 	void updateFocused(bool focused) override;
 
+	bool hasVirtualKeyboard() const override;
 	void showKeyboard(LocalPlayerID playerId, const VirtualKeyboard& keyboard) override;
 	void hideKeyboard(LocalPlayerID playerId) override;
 	void onHideKeyboard() override;

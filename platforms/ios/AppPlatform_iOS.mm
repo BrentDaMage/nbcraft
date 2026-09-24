@@ -107,6 +107,11 @@ void AppPlatform_iOS::setShiftPressed(bool b, bool isLeft)
 	m_bShiftPressed[isLeft ? 0 : 1] = b;
 }
 
+bool AppPlatform_iOS::hasVirtualKeyboard() const
+{
+    return true;
+}
+
 void AppPlatform_iOS::showKeyboard(LocalPlayerID playerId, const VirtualKeyboard& keyboard)
 {
 	[m_pViewController showKeyboard];
@@ -121,8 +126,9 @@ void AppPlatform_iOS::hideKeyboard(LocalPlayerID playerId)
 
 unsigned int AppPlatform_iOS::getKeyboardUpOffset() const
 {
-	// @TODO
-	// For now we'll just return 1/2 of the screen height. That ought to cover most cases.
+	if (!m_bIsKeyboardShown)
+		return 0;
+	
 	return m_pViewController.height / 2;
 }
 

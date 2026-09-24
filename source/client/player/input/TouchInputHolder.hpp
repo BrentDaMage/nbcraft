@@ -24,7 +24,7 @@ public:
 	IMoveInput* getMoveInput() override;
 	ITurnInput* getTurnInput() override;
 	IBuildInput* getBuildInput() override;
-	void setScreenSize(int width, int height) override;
+	void setScreenSize(const ViewportSize& size) override;
 
 public:
 	TouchscreenInput_TestFps m_touchScreenInput;

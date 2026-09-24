@@ -19,7 +19,7 @@ public:
 	IInputHolder();
 	virtual ~IInputHolder();
 	virtual bool allowPicking();
-	virtual void setScreenSize(int width, int height);
+	virtual void setScreenSize(const ViewportSize& size);
 	virtual bool allowsInputMethod(InputMethod::Type) const;
 	virtual IMoveInput* getMoveInput() = 0;
 	virtual ITurnInput* getTurnInput() = 0;
