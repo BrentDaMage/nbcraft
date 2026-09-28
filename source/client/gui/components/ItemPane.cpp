@@ -147,7 +147,7 @@ void ItemPane::renderBatch(std::vector<GridItem>& items, float a)
                 y = Gui::FloorAlignToScreenPixel(yOffs + 6.0f);
                 font.drawShadow(cItem.m_subtext, x, y, 0xFFF0F0F0);
 
-                t.scale2d(0.6667, 0.6667);
+                t.scale2d(0.6667f, 0.6667f);
 
                 x = Gui::FloorAlignToScreenPixel((((float)m_itemRect.w + xOffs) - (float)(4 * countStr.size())) * 1.5f);
                 y = Gui::FloorAlignToScreenPixel((((float)m_itemRect.h + yOffs) - 8.0f) * 1.5f);

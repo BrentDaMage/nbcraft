@@ -45,7 +45,7 @@ private:
 public:
 	static bool isVignetteAvailable() { return _isVignetteAvailable; }
 	static void setIsVignetteAvailable(bool value) { _isVignetteAvailable = value; }
-	static float FloorAlignToScreenPixel(float f) { return (f * (1.0f / Gui::GuiScale)) * Gui::GuiScale; }
+	static float FloorAlignToScreenPixel(float f) { return (f * Gui::GuiScale) * Gui::InvGuiScale; }
 
 private:
 	void renderPumpkin(int, int);
@@ -83,6 +83,7 @@ public:
 
 public:
 	static float GuiScale;
+	static float InvGuiScale;
 	static int GuiWidth;
 	static int GuiHeight;
     

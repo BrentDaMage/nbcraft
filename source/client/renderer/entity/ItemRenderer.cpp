@@ -246,7 +246,7 @@ void ItemRenderer::renderGuiItemOverlay(Minecraft& mc, const ItemStack& item, in
 
 	int width = mc.m_pFont->width(amtstr);
 
-	mc.m_pFont->drawShadow(amtstr, x + 17 - width, y + 6 + 3, 0xFFFFFF);
+	mc.m_pFont->drawShadow(amtstr, x + 17 - width, y + 6 + 3, Color::WHITE);
 }
 
 void ItemRenderer::renderGuiItem(Minecraft& mc, const ItemStack& item, int x, int y, const Color& color)

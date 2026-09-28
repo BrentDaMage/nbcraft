@@ -20,7 +20,7 @@ public:
 	{
 	public:
 		virtual void onItemSelected(const ItemPane& itemPane, Container::StackID stackId) = 0;
-		virtual std::vector<CItem*> getItems(const ItemPane& itemPane) = 0;
+		virtual std::vector<CItem*>& getItems(const ItemPane& itemPane) = 0;
 	};
 
 public:

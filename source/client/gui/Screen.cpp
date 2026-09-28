@@ -142,6 +142,7 @@ void Screen::init(Minecraft* pMinecraft, int width, int height)
 	if (m_screenType == SCREEN_UNIVERSAL || (m_screenType == SCREEN_GENERIC && userTheme != UI_CONSOLE))
 		m_uiTheme = userTheme;
 
+	// @TODO: call init here instead
 	setSize(width, height);
 	initMenuPointer();
 	_updateTabButtonSelection();
@@ -464,6 +465,7 @@ void Screen::setSize(int width, int height)
 	m_width = width;
 	m_height = height;
 
+	// @TODO: should be _setupPositions() instead
 	// not original code. Will need to re-init again
 	m_elements.clear();
 	init();
@@ -572,7 +574,7 @@ int Screen::getYOffset()
 	GuiElement* element = _getSelectedElement();
 	if (element && element->getType() == GuiElement::TYPE_TEXTBOX)
 	{
-		int heightLeft = m_height - int(float(keybOffset) / Minecraft::GetRenderScaleMultiplier() * Gui::GuiScale);
+		int heightLeft = m_height - int(float(keybOffset) / Minecraft::GetRenderScaleMultiplier() * Gui::InvGuiScale);
 
 		// we want to keep the center of the text box in the center of the screen
 		int textCenterY = element->m_yPos + (element->m_height / 2);
@@ -858,7 +860,7 @@ void Screen::handleControllerStickEvent(const GameController::StickEvent& stick,
 		Vec2 targetVelocity(snap * speed * moveSensitivity);
 		targetVelocity.x = stickAbs.x < C_POINTER_MINIMUM_SPEED ? C_POINTER_MINIMUM_SPEED * Mth::signum(targetVelocity.x) : targetVelocity.x;
 		targetVelocity.y = stickAbs.y < C_POINTER_MINIMUM_SPEED ? C_POINTER_MINIMUM_SPEED * Mth::signum(targetVelocity.y) : targetVelocity.y; // * speedY;
-		targetVelocity *= Gui::GuiScale;
+		targetVelocity *= Gui::InvGuiScale;
 
 		// Multiply by delta for smooth movement
 		Vec2 move = targetVelocity * C_POINTER_FRICTION * deltaTime;

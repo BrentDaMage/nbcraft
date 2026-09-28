@@ -301,5 +301,5 @@ void ScreenRenderer::fillHorizontalGradient(float left, float top, float right, 
 
 void ScreenRenderer::fillHorizontalGradient(int left, int top, int right, int bottom, const Color& colorLeft, const Color& colorRight)
 {
-    fillGradient(float(left), float(top), float(right), float(bottom), colorLeft, colorDcolorRightown);
+    fillGradient(float(left), float(top), float(right), float(bottom), colorLeft, colorRight);
 }

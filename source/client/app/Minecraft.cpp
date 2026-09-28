@@ -1175,12 +1175,13 @@ void Minecraft::sizeUpdate()
 	const ViewportSize& size = GetViewportSize();
 
     // re-calculate the GUI scale.
-	Gui::GuiScale = 1.0f / getBestScaleForThisScreenSize(size.logical.width, size.logical.height);
+	Gui::GuiScale = getBestScaleForThisScreenSize(size.logical.width, size.logical.height);
+	Gui::InvGuiScale = 1.0f / Gui::GuiScale;
 
 	// The ceil gives an extra pixel to the screen's width and height, in case the GUI scale doesn't
 	// divide evenly into width or height, so that none of the game screen is uncovered.
-	float newGuiWidth  = ceilf(size.logical.width  * Gui::GuiScale);
-	float newGuiHeight = ceilf(size.logical.height * Gui::GuiScale);
+	float newGuiWidth  = ceilf(size.logical.width  * Gui::InvGuiScale);
+	float newGuiHeight = ceilf(size.logical.height * Gui::InvGuiScale);
 	
 	// GuiSize did not change, bail out
 	if (newGuiWidth == Gui::GuiWidth && newGuiHeight == Gui::GuiHeight)

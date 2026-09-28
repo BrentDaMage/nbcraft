@@ -34,10 +34,13 @@ Gui::Materials::Materials()
 }
 
 #ifdef ENH_USE_GUI_SCALE_2
-float Gui::GuiScale = 1.0f / 2.0f;
+float Gui::GuiScale = 2.0f;
 #else
-float Gui::GuiScale = 1.0f / 3.0f;
+float Gui::GuiScale = 3.0f;
 #endif
+
+float Gui::InvGuiScale = 1.0f / Gui::GuiScale;
+
 int Gui::GuiWidth = Minecraft::GetWidthL();
 int Gui::GuiHeight = Minecraft::GetHeightL();
 
@@ -425,7 +428,7 @@ void Gui::handleClick(int clickID, int mouseX, int mouseY)
 	if (m_pMinecraft->useTouchscreen() && slot == getNumSlots() - 1)
 	{
 		if (m_pMinecraft->getLocalPlayerGameMode()->isSurvivalType())
-			m_pMinecraft->setScreen(new InventoryScreen(m_pMinecraft->m_pLocalPlayer));
+			m_pMinecraft->getScreenChooser()->pushInventoryScreen(m_pMinecraft->m_pLocalPlayer);
 		else
 			m_pMinecraft->getScreenChooser()->pushCreativeScreen(m_pMinecraft->m_pLocalPlayer);
 	}
@@ -468,7 +471,7 @@ void Gui::handleUserAction(const ActionInfo& info)
 
 	if (options->isAction(AID_INVENTORY, info))
 	{
-		m_pMinecraft->setScreen(new InventoryScreen(m_pMinecraft->m_pLocalPlayer));
+		m_pMinecraft->getScreenChooser()->pushInventoryScreen(m_pMinecraft->m_pLocalPlayer);
 		return;
 	}
 
