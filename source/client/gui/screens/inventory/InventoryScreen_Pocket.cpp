@@ -123,20 +123,20 @@ void InventoryScreen_Pocket::render(float a)
     Screen::render(a);
 
 	currentShaderColor = Color::WHITE;
-	/*m_pMinecraft->m_pTextures->loadAndBindTexture("gui/itemframe.png");
-	blit(
-		0, m_inventoryPane->m_yPos - 6,
-		0, 0,
-		m_width,
-		m_inventoryPane->m_height + 12,
-		215,
-		256);*/
 
 	IntRectangle frameRect(
 		0, m_inventoryPane->m_yPos - 6,
 		m_width,
 		m_inventoryPane->m_height + 12
 	);
+
+	/*m_pMinecraft->m_pTextures->loadAndBindTexture("gui/itemframe.png");
+	blit(
+		frameRect.x, frameRect.y,
+		0, 0,
+		frameRect.w, frameRect.h,
+		215, 256
+	);*/
 
 	blitNineSlice(*m_pMinecraft->m_pTextures, SPRITE_SCREEN_FRAME,
 		frameRect.x, frameRect.y, frameRect.w, frameRect.h,
