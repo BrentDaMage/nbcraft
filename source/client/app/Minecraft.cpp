@@ -1568,6 +1568,12 @@ void Minecraft::SetViewportSize(unsigned int widthP, unsigned int heightP)
 
 void Minecraft::SetViewportSize(unsigned int widthP, unsigned int heightP, unsigned int widthL, unsigned int heightL)
 {
+	// Prevent creation of a 0x0 window, can cause crashes, like in GLM on the 3D title logo
+	widthP  = Mth::Max<unsigned int>(widthP,  1);
+	heightP = Mth::Max<unsigned int>(heightP, 1);
+	widthL  = Mth::Max<unsigned int>(widthL,  1);
+	heightL = Mth::Max<unsigned int>(heightL, 1);
+
 	Minecraft::_viewportSize.physical.width  = widthP;
 	Minecraft::_viewportSize.physical.height = heightP;
 

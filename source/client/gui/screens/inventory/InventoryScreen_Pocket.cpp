@@ -1,6 +1,8 @@
 #include "InventoryScreen_Pocket.hpp"
 #include "renderer/ShaderConstants.hpp"
 
+static const TextureAtlasSprite SPRITE_SCREEN_FRAME = TextureAtlasSprite(130, 139, 24, 24, "gui/gui2.png", 256, 256);
+
 InventoryScreen_Pocket::InventoryScreen_Pocket(Player* player)
     : m_pPlayer(player)
 	, m_header("Select blocks")
@@ -21,6 +23,7 @@ void InventoryScreen_Pocket::_setupPositions()
     m_btnCraft.m_xPos = 0;
     m_btnCraft.m_yPos = 0;
     m_btnCraft.m_width = 48;
+	m_btnCraft.m_height = m_header.m_height;
 
     m_btnExit.m_xPos = m_width - m_btnExit.m_width;
     m_btnExit.m_yPos = 0;
@@ -69,7 +72,7 @@ void InventoryScreen_Pocket::init()
     if (m_width - 20 < 0)
         v4 = m_width + 11;
     int v5 = v4 >> 5;
-    //dword188 = v5;
+    //this->dword188 = v5;
     v5 *= 32;
     int v6 = m_width - v5;
 
@@ -117,29 +120,33 @@ void InventoryScreen_Pocket::init()
 
 void InventoryScreen_Pocket::render(float a)
 {
-    //glDisable(GL_DEPTH_TEST);
-    //glEnable(GL_BLEND);
-
     Screen::render(a);
-    m_inventoryPane->render(m_menuPointer, a);
 
 	currentShaderColor = Color::WHITE;
-    //Tesselator::instance.color(Color::WHITE);
-    m_pMinecraft->m_pTextures->loadAndBindTexture("gui/itemframe.png");
-    //glEnable(GL_BLEND);
-    //glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	/*m_pMinecraft->m_pTextures->loadAndBindTexture("gui/itemframe.png");
+	blit(
+		0, m_inventoryPane->m_yPos - 6,
+		0, 0,
+		m_width,
+		m_inventoryPane->m_height + 12,
+		215,
+		256);*/
 
-    blit(
-        0, m_inventoryPane->m_rect.y - 6,
-        0, 0,
-        m_width,
-        m_inventoryPane->m_rect.h + 12,
-        215,
-        256);
+	IntRectangle frameRect(
+		0, m_inventoryPane->m_yPos - 6,
+		m_width,
+		m_inventoryPane->m_height + 12
+	);
 
-    //glDisable(GL_BLEND);
-    //glEnable(GL_DEPTH_TEST);
+	blitNineSlice(*m_pMinecraft->m_pTextures, SPRITE_SCREEN_FRAME,
+		frameRect.x, frameRect.y, frameRect.w, frameRect.h,
+		8
+	);
+
+	/*fillGradient(
+		frameRect.x, frameRect.y, frameRect.x + frameRect.w, frameRect.y + frameRect.h,
+		Color(40, 36, 35, 109), Color::NIL
+	);*/
 }
 
 void InventoryScreen_Pocket::tick()

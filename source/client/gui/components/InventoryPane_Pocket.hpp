@@ -6,6 +6,9 @@
 
 class InventoryPane_Pocket : public ScrollingPane
 {
+public:
+	static const Color BACKGROUND_COLOR;
+
 protected:
 	class Materials
 	{
@@ -41,9 +44,7 @@ public:
 
 protected:
 	Materials m_itemMaterials;
-public:
-	IntRectangle m_rect;
-protected:
+	//IntRectangle m_rect;
 	int m_widthOrSomething;
 	RectangleArea* m_pRectArea;
 	ICallback& m_callback;
@@ -53,8 +54,8 @@ public:
 	int m_paddingY;
 	int m_selectedId;
 	int m_clickAnimTick;
-	int m_paneLeftX;
-	int m_paneLeftY;
-	int m_paneRightX;
-	int m_paneRightY;
+	//int m_paneLeftX;
+	//int m_paneLeftY;
+	//int m_paneRightX;
+	//int m_paneRightY;
 };

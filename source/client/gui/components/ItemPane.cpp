@@ -83,10 +83,10 @@ void ItemPane::renderBatch(std::vector<GridItem>& items, float a)
 
     {
         mce::EnableScissorTest scissor(
-            m_scale * m_areaRect.x,
-            m_screenHeight - (m_scale * (m_areaRect.h + m_areaRect.y)),
-            m_scale * m_areaRect.w,
-            m_scale * m_areaRect.h);
+            m_scale * m_xPos,
+            m_screenHeight - (m_scale * (m_height + m_yPos)),
+            m_scale * m_width,
+            m_scale * m_height);
 
         t.begin(0);
         t.voidBeginAndEndCalls(true);
@@ -103,7 +103,7 @@ void ItemPane::renderBatch(std::vector<GridItem>& items, float a)
 
             float x = Gui::FloorAlignToScreenPixel(item.screenPos.x - 1.0f);
             float y = Gui::FloorAlignToScreenPixel(item.screenPos.y);
-            blitNineSlice(textures, "gui/spritesheet.png", x, y, m_areaRect.w + 4, 22, 3);
+            blitNineSlice(textures, "gui/spritesheet.png", x, y, m_width + 4, 22, 3);
         }
 
         t.voidBeginAndEndCalls(false);
@@ -178,34 +178,34 @@ void ItemPane::renderBatch(std::vector<GridItem>& items, float a)
         if (m_bVertical)
         {
             fillGradient(
-                m_areaRect.x,
-                m_areaRect.y,
-                m_areaRect.x + m_areaRect.w,
-                m_areaRect.y + 28,
+                m_xPos,
+                m_yPos,
+                m_xPos + m_width,
+                m_yPos + 28,
                 0xBB000000,
                 Color::NIL);
             fillGradient(
-                m_areaRect.x,
-                m_areaRect.y + m_areaRect.h - 28,
-                m_areaRect.x + m_areaRect.w,
-                m_areaRect.y + m_areaRect.h,
+                m_xPos,
+                m_yPos + m_height - 28,
+                m_xPos + m_width,
+                m_yPos + m_height,
                 Color::NIL,
                 0xBB000000);
         }
         else
         {
             fillHorizontalGradient(
-                m_areaRect.x,
-                m_areaRect.y,
-                m_areaRect.x + 28,
-                m_areaRect.y + m_areaRect.h,
+                m_xPos,
+                m_yPos,
+                m_xPos + 28,
+                m_yPos + m_height,
                 0xBB000000,
                 Color::NIL);
             fillHorizontalGradient(
-                m_areaRect.w + m_areaRect.x - 28,
-                m_areaRect.y,
-                m_areaRect.x + m_areaRect.w,
-                m_areaRect.y + m_areaRect.h,
+                m_width + m_xPos - 28,
+                m_yPos,
+                m_xPos + m_width,
+                m_yPos + m_height,
                 Color::NIL,
                 0xBB000000);
         }

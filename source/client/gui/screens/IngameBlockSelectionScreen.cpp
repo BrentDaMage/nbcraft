@@ -224,6 +224,7 @@ void IngameBlockSelectionScreen::renderSlot(int index, int x, int y, float f)
 		return;
 
 	ItemRenderer::singleton().renderGuiItem(*m_pMinecraft, item, x, y);
+	ItemRenderer::singleton().renderGuiItemText(*m_pMinecraft, item, x, y);
 	ItemRenderer::singleton().renderGuiItemOverlay(*m_pMinecraft, item, x, y);
 }
 

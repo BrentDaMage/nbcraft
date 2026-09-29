@@ -359,7 +359,7 @@ void Screen::renderMenuBackground(float f)
 		}
 	}
 
-	fillGradient(0, 0, m_width, m_height, Color(0, 0, 0, 137), Color(255, 255, 255, 137));
+	fillGradient(0, 0, m_width, m_height, Color(255, 255, 255, 137), Color(0, 0, 0, 137));
 }
 
 void Screen::renderConsolePanorama(bool isNight)
@@ -883,9 +883,9 @@ void Screen::renderBackground(int vo)
 		// draw the background offset by the Y offset so that the smaller virtual
 		// keyboards don't reveal undrawn areas
 		if (m_uiTheme == UI_CONSOLE)
-			fillGradient(0, m_yOffset, m_width, m_height, Color(16, 16, 16, 100), Color(16, 16, 16, 112)); 
+			fillGradient(0, m_yOffset, m_width, m_height, Color(16, 16, 16, 112), Color(16, 16, 16, 100));
 		else
-			fillGradient(0, m_yOffset, m_width, m_height, Color(16, 16, 16, 192), Color(16, 16, 16, 208));
+			fillGradient(0, m_yOffset, m_width, m_height, Color(16, 16, 16, 208), Color(16, 16, 16, 192));
 	}
 	else
 	{

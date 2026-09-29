@@ -262,11 +262,11 @@ void ScreenRenderer::fillGradient(float left, float top, float right, float bott
     t.begin(4);
 
     t.color(colorUp);
-    t.vertex(left, bottom, 0.0f);
-    t.vertex(right, bottom, 0.0f);
-    t.color(colorDown);
     t.vertex(right, top, 0.0f);
     t.vertex(left, top, 0.0f);
+    t.color(colorDown);
+    t.vertex(left, bottom, 0.0f);
+    t.vertex(right, bottom, 0.0f);
 
     t.draw(m_materials.ui_fill_gradient);
 

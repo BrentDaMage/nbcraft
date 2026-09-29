@@ -62,6 +62,7 @@ public:
 	void render(float f, bool bHaveScreen);
 	void tick();
 	void renderSlot(int slot, int x, int y, float f);
+	void renderSlotText(int slot, int x, int y, float f);
 	void renderSlotOverlay(int slot, int x, int y, float f);
 	void renderAnimatedCharacter(int x, int y, float);
 	int  getSlotIdAt(int mx, int my);

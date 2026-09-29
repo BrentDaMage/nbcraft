@@ -779,13 +779,13 @@
     <ClInclude Include="$(MC_ROOT)\source\client\app\VirtualKeyboardManager.hpp">
       <Filter>Header Files\App</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\source\client\gui\components\InventoryPane_Pocket.hpp">
+    <ClInclude Include="$(MC_ROOT)\source\client\gui\components\InventoryPane_Pocket.hpp">
       <Filter>Header Files\GUI\Components</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\source\client\gui\screens\inventory\InventoryScreen_Pocket.hpp">
+    <ClInclude Include="$(MC_ROOT)\source\client\gui\screens\inventory\InventoryScreen_Pocket.hpp">
       <Filter>Header Files\GUI\Screens\Inventory</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\source\client\gui\components\THeader_Pocket.hpp">
+    <ClInclude Include="$(MC_ROOT)\source\client\gui\components\THeader_Pocket.hpp">
       <Filter>Header Files\GUI\Components</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1417,14 +1417,17 @@
     <ClCompile Include="$(MC_ROOT)\source\client\app\VirtualKeyboardManager.cpp">
       <Filter>Source Files\App</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\client\gui\components\InventoryPane_Pocket.cpp">
+    <ClCompile Include="$(MC_ROOT)\source\client\gui\components\InventoryPane_Pocket.cpp">
       <Filter>Source Files\GUI\Components</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\client\gui\screens\inventory\InventoryScreen_Pocket.cpp">
+    <ClCompile Include="$(MC_ROOT)\source\client\gui\screens\inventory\InventoryScreen_Pocket.cpp">
       <Filter>Source Files\GUI\Screens\Inventory</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\client\gui\components\THeader_Pocket.cpp">
+    <ClCompile Include="$(MC_ROOT)\source\client\gui\components\THeader_Pocket.cpp">
       <Filter>Source Files\GUI\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MC_ROOT)\source\client\gui\IntRectangle.cpp">
+      <Filter>Source Files\GUI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

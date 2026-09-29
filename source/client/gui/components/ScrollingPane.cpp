@@ -1,17 +1,18 @@
 #include "ScrollingPane.hpp"
 #include "common/Utils.hpp"
+#include "client/app/Minecraft.hpp"
 
 #define C_SCROLLBAR_WIDTH 2.3333f
 #define C_SCROLLBAR_HEIGHT 2.3333f
 #define C_HOLD_DURATION_MS 150
 
 ScrollingPane::ScrollingPane(Flags flags, const IntRectangle& areaRect, const IntRectangle& a4, int columns, int itemCount, float scale, const IntRectangle& itemRect)
-    : m_flags(flags)
+    : GuiElement(areaRect)
+    , m_flags(flags)
     , m_scale(scale)
     , m_itemCount(itemCount)
     , m_guiRatio(1.0f / scale)
-    , m_areaRect(areaRect)
-    , m_area(m_areaRect.x, m_areaRect.x + m_areaRect.w, m_areaRect.y, m_areaRect.y + m_areaRect.h)
+    , m_area(m_xPos, m_xPos + m_width, m_yPos, m_yPos + m_height)
     , m_interactArea(m_area)
     , m_bounds(areaRect)
     , m_itemRect(itemRect.w <= 0 ? a4 : itemRect)
@@ -42,7 +43,7 @@ ScrollingPane::ScrollingPane(Flags flags, const IntRectangle& areaRect, const In
 
     if (m_columns <= 0)
     {
-        m_columns = m_areaRect.w / m_itemRect.w;
+        m_columns = m_width / m_itemRect.w;
         if (m_columns <= 0)
         {
             LOG_W("Columns are 0! Area width is smaller than item width. Setting columns to 1.");
@@ -59,12 +60,12 @@ ScrollingPane::ScrollingPane(Flags flags, const IntRectangle& areaRect, const In
     }
 
     m_scrollBarV.size = Vec2(C_SCROLLBAR_WIDTH, C_SCROLLBAR_HEIGHT);
-    m_scrollBarV.pos.x = (float)(m_areaRect.x + m_areaRect.w) - C_SCROLLBAR_WIDTH;
+    m_scrollBarV.pos.x = (float)(m_xPos + m_width) - C_SCROLLBAR_WIDTH;
     m_scrollBarV.pos.y = 0.0f;
 
     m_scrollBarH.size = Vec2(C_SCROLLBAR_WIDTH, C_SCROLLBAR_HEIGHT);
     m_scrollBarH.pos.x = 0.0f;
-    m_scrollBarH.pos.y = (float)(m_areaRect.y + m_areaRect.h) - C_SCROLLBAR_HEIGHT;
+    m_scrollBarH.pos.y = (float)(m_yPos + m_height) - C_SCROLLBAR_HEIGHT;
 }
 
 ScrollingPane::~ScrollingPane()
@@ -169,7 +170,7 @@ void ScrollingPane::_updateVerticalScrollIndicator()
     }
 
     m_scrollBarV.size.y = v9;
-    m_scrollBarV.pos.y = (float)m_areaRect.y + v11;
+    m_scrollBarV.pos.y = (float)m_yPos + v11;
 }
 
 void ScrollingPane::_updateHorizontalScrollIndicator()
@@ -205,7 +206,7 @@ void ScrollingPane::_updateHorizontalScrollIndicator()
     }
 
     m_scrollBarH.size.x = v9;
-    m_scrollBarH.pos.x = (float)m_areaRect.x + v11;
+    m_scrollBarH.pos.x = (float)m_xPos + v11;
 }
 
 void ScrollingPane::_setContentOffsetWithAnimation(const Vec3& contentOffset, bool ignoreScrollbars)
@@ -238,8 +239,8 @@ void ScrollingPane::_setContentOffset(const Vec2& offset)
 
 void ScrollingPane::_adjustContentSize()
 {
-    m_contentWidth  = Mth::Max(m_itemRect.w * m_columns, m_areaRect.w);
-    m_contentHeight = Mth::Max(m_itemRect.h * m_rows,    m_areaRect.h);
+    m_contentWidth  = Mth::Max(m_itemRect.w * m_columns, m_width);
+    m_contentHeight = Mth::Max(m_itemRect.h * m_rows,    m_height);
 }
 
 void ScrollingPane::_snapContentOffsetToBounds(bool ignoreScrollbars)
@@ -583,7 +584,7 @@ void ScrollingPane::_touchesEnded(const Vec2& pos, int time)
     if (!m_bDecelerating)
     {
         float inverseY = m_inverseContentOffset.y;
-        if (inverseY >= 0.0f && inverseY <= m_areaRect.h)
+        if (inverseY >= 0.0f && inverseY <= m_height)
         {
             _snapContentOffsetToBounds(true);
             _hideScrollIndicators();
@@ -621,8 +622,8 @@ ScrollingPane::GridItem ScrollingPane::_getItemForPos(const Vec2& pos, bool b)
 
     if (b)
     {
-        nPos.x = pos.x - m_areaRect.x;
-        nPos.y = pos.y - m_areaRect.y;
+        nPos.x = pos.x - m_xPos;
+        nPos.y = pos.y - m_yPos;
     }
 
     nPos += m_inverseContentOffset;
@@ -747,8 +748,8 @@ void ScrollingPane::setSelected(int id, bool isSelected)
 
 void ScrollingPane::translate(const Vec2& t)
 {
-    m_areaRect.x += t.x;
-    m_areaRect.y += t.y;
+    m_xPos += t.x;
+    m_yPos += t.y;
     /*m_area.left += x;
     m_area.right += x;
     m_area.top += y;
@@ -765,10 +766,10 @@ bool ScrollingPane::getGridItemFor_slow(int id, GridItem& result)
 {
     GridItem topLeftItem = _getItemForPos(Vec2::ZERO, false);
 
-    GridItem v15 = _getItemForPos(Vec2((float)m_areaRect.w - 1.0f, (float)m_areaRect.h - 1.0f), false);
+    GridItem v15 = _getItemForPos(Vec2((float)m_width - 1.0f, (float)m_height - 1.0f), false);
     
-    float v9  = ((float)m_areaRect.x - m_inverseContentOffset.x) + (topLeftItem.screenPos.x - topLeftItem.x);
-    float v10 = ((float)m_areaRect.y - m_inverseContentOffset.y) + (topLeftItem.screenPos.y - topLeftItem.y);
+    float v9  = ((float)m_xPos - m_inverseContentOffset.x) + (topLeftItem.screenPos.x - topLeftItem.x);
+    float v10 = ((float)m_yPos - m_inverseContentOffset.y) + (topLeftItem.screenPos.y - topLeftItem.y);
 
     int width = id % m_columns;
     int height = id / m_columns;
@@ -785,8 +786,10 @@ bool ScrollingPane::getGridItemFor_slow(int id, GridItem& result)
         && height <= v15.y;
 }
 
-void ScrollingPane::render(const MenuPointer& pointer, float a)
+void ScrollingPane::render(Minecraft* pMinecraft, const MenuPointer& pointer)
 {
+    float a = pMinecraft->m_timer.m_partialTicks;
+
     _handleUserInput(pointer);
 
     m_timer.advanceTime(false);
@@ -808,12 +811,12 @@ void ScrollingPane::render(const MenuPointer& pointer, float a)
 
     // Retrieve active grid item positions for rendering bounds
     GridItem startItem = _getItemForPos(Vec2::ZERO, false);
-    GridItem endItem   = _getItemForPos(Vec2(m_areaRect.w - 1, m_areaRect.h - 1), false);
+    GridItem endItem   = _getItemForPos(Vec2(m_width - 1, m_height - 1), false);
 
     // Calculate rendering offsets
     Vec2 basePos(
-        ((float)m_areaRect.x - m_inverseContentOffset.x) + (startItem.screenPos.x - startItem.x),
-        ((float)m_areaRect.y - m_inverseContentOffset.y) + (startItem.screenPos.y - startItem.y)
+        ((float)m_xPos - m_inverseContentOffset.x) + (startItem.screenPos.x - startItem.x),
+        ((float)m_yPos - m_inverseContentOffset.y) + (startItem.screenPos.y - startItem.y)
     );
 
     // Loop through visible grid columns and rows

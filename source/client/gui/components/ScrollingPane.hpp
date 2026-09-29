@@ -96,7 +96,7 @@ public:
 	void setSelected(int id, bool isSelected);
 	void translate(const Vec2& t);
 	bool getGridItemFor_slow(int id, GridItem& result);
-	void render(const MenuPointer& pointer, float a);
+	void render(Minecraft* pMinecraft, const MenuPointer& pointer) override;
 
 	bool hasHorizontalScrolling() const { return !_hasFlag(FLAG_NOSCROLLH); }
 	bool hasVerticalScrolling() const { return !_hasFlag(FLAG_NOSCROLLV); }
@@ -124,7 +124,6 @@ protected:
 	Vec2 m_inverseContentOffset;
 	float m_scale;
 	float m_guiRatio;
-	IntRectangle m_areaRect;
 	IntRectangle m_itemRect;
 	RectangleArea m_area;
 	RectangleArea m_interactArea;
