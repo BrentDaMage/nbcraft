@@ -210,6 +210,7 @@ void ScrollingPane::_updateHorizontalScrollIndicator()
 
 void ScrollingPane::_setContentOffsetWithAnimation(const Vec3& contentOffset, bool ignoreScrollbars)
 {
+    m_contentOffset = contentOffset;
     m_inverseContentOffset.x = -m_contentOffset.x;
     m_inverseContentOffset.y = -m_contentOffset.y;
 
@@ -656,7 +657,7 @@ void ScrollingPane::_updateHighlightItem(const Vec2& pos)
     GridItem item = _getItemForPos(pos, true);
     if (item.id >= 0 && item.id < m_itemCount)
     {
-        LOG_I("touched: %d", item.id);
+        //LOG_I("touched: %d", item.id);
         m_touchedId = item.id;
         if (!m_interactArea.isInside(pos.x, pos.y))
             m_touchedId = -1;
