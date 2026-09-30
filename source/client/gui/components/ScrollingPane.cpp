@@ -11,8 +11,7 @@ ScrollingPane::ScrollingPane(Flags flags, const IntRectangle& areaRect, const In
     , m_flags(flags)
     , m_scale(scale)
     , m_itemCount(itemCount)
-    , m_guiRatio(1.0f / scale)
-    , m_area(m_xPos, m_xPos + m_width, m_yPos, m_yPos + m_height)
+    , m_area(m_xPos, m_yPos, m_xPos + m_width, m_yPos + m_height)
     , m_interactArea(m_area)
     , m_bounds(areaRect)
     , m_itemRect(itemRect.w <= 0 ? a4 : itemRect)
@@ -620,12 +619,20 @@ ScrollingPane::GridItem ScrollingPane::_getItemForPos(const Vec2& pos, bool b)
 {
     Vec2 nPos = pos;
 
+    /* undoing our basePos math from the render function
+    Vec2 basePos(
+        (startItem.screenPos.x - startItem.x) + ((float)m_xPos - m_inverseContentOffset.x),
+        (startItem.screenPos.y - startItem.y) + ((float)m_yPos - m_inverseContentOffset.y)
+    );
+    */
+
     if (b)
     {
-        nPos.x = pos.x - m_xPos;
-        nPos.y = pos.y - m_yPos;
+        nPos.x -= m_xPos;
+        nPos.y -= m_yPos;
     }
 
+    // from PE 0.3.3, misordered?
     nPos += m_inverseContentOffset;
 
     if (hasHorizontalWrapping())
@@ -639,7 +646,7 @@ ScrollingPane::GridItem ScrollingPane::_getItemForPos(const Vec2& pos, bool b)
     item.screenPos.y = nPos.y / m_itemRect.h;
     item.x = item.screenPos.x;
     item.y = item.screenPos.y;
-    item.id = (int)item.screenPos.x + m_columns * (int)item.screenPos.y;
+    item.id = (int)item.screenPos.x + (int)item.screenPos.y * m_columns;
 
     return item;
 }
@@ -649,6 +656,7 @@ void ScrollingPane::_updateHighlightItem(const Vec2& pos)
     GridItem item = _getItemForPos(pos, true);
     if (item.id >= 0 && item.id < m_itemCount)
     {
+        LOG_I("touched: %d", item.id);
         m_touchedId = item.id;
         if (!m_interactArea.isInside(pos.x, pos.y))
             m_touchedId = -1;
@@ -679,7 +687,7 @@ void ScrollingPane::_touchesBegan(const Vec2& pos, int time)
 
 void ScrollingPane::_handleUserInput(const MenuPointer& pointer)
 {
-    Vec2 pointerPos((float)pointer.x * m_guiRatio, (float)pointer.y * m_guiRatio);
+    Vec2 pointerPos(pointer.x, pointer.y);
     int currentTime = getTimeMs();
 
     bool hasPointerMoved = m_pointerPos != pointerPos;

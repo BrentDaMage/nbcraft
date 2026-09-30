@@ -183,7 +183,7 @@ bool InventoryScreen_Pocket::addItem(const InventoryPane_Pocket& pane, int id)
 
 	//inventory.moveToSelectionSlot(0, id + 9, 1);
 	inventory.selectSlot(0);
-	m_pMinecraft->m_pSoundEngine->playUI("random.pop2", 1.0f, 0.3f);
+	m_pMinecraft->m_pSoundEngine->playUI("random.pop", 1.0f, 0.3f);
 	//m_pMinecraft->m_pGui->flashSlot(0);
 	return true;
 }

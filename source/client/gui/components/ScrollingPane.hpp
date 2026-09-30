@@ -123,7 +123,7 @@ protected:
 	int m_itemCount;
 	Vec2 m_inverseContentOffset;
 	float m_scale;
-	float m_guiRatio;
+	//float m_guiRatio;
 	IntRectangle m_itemRect;
 	RectangleArea m_area;
 	RectangleArea m_interactArea;
