@@ -28,6 +28,7 @@ public:
 	void prepareCreativeInventory();
 	void prepareSurvivalInventory();
 
+	std::string getName() const override;
 	Size getContainerSize() const override;
 
 	void clear();
@@ -80,12 +81,6 @@ public:
 	// v0.2.0 name alias
 	ItemStack& getSelected() { return getSelectedItem(); }
 
-	std::string getName() const override
-	{
-		//@TODO: Language
-		return "Inventory";
-	}
-
 	void setContainerChanged(StackID stackId) override;
 	void addContentChangeListener(ContainerContentChangeListener* listener) override;
 	void removeContentChangeListener(ContainerContentChangeListener* listener) override;
@@ -93,7 +88,7 @@ public:
 	bool stillValid(Player& player) const override { return true; }
 	
 private:
-	GameType _getGameMode() const;
+	GameType _getGameMode() const { return m_pPlayer->getPlayerGameType(); }
 	int getSlotWithRemainingSpace(const ItemStack& item) const;
 	int getFreeSlot() const;
 	int addResource(const ItemStack& item);

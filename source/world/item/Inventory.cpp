@@ -121,6 +121,12 @@ void Inventory::prepareSurvivalInventory()
 #endif
 }
 
+std::string Inventory::getName() const
+{
+	//@TODO: Language
+	return "Inventory";
+}
+
 Container::Size Inventory::getContainerSize() const
 {
 	return (Size)(m_items.size() + m_armor.size());

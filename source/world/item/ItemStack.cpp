@@ -20,7 +20,7 @@ const ItemStack ItemStack::EMPTY;
 
 #define C_INVALID_ID 0
 
-void ItemStack::_init(int id, int count, int auxValue)
+void ItemStack::_init(int id, Count count, AuxValue auxValue)
 {
 	m_count = count;
 	m_auxValue = auxValue;
