@@ -1,8 +1,9 @@
 #include "FillingContainer.hpp"
 #include "common/Logger.hpp"
 #include "world/entity/Player.hpp"
+#include "world/item/crafting/Recipes.hpp"
 
-#define C_INVALID_LINKED_SLOT -1
+#define C_INVALID_SLOT -1
 
 FillingContainer::FillingContainer(Size size, Size linkedSlotsCount, bool isUnlimited)
 	: m_linkedSlots(nullptr)
@@ -13,7 +14,7 @@ FillingContainer::FillingContainer(Size size, Size linkedSlotsCount, bool isUnli
 	if (linkedSlotsCount > 0)
 	{
 		m_linkedSlots = new StackID[m_linkedSlotsCount];
-		std::fill(m_linkedSlots, &m_linkedSlots[m_linkedSlotsCount - 1], C_INVALID_LINKED_SLOT);
+		std::fill(m_linkedSlots, &m_linkedSlots[m_linkedSlotsCount - 1], C_INVALID_SLOT);
 	}
 
 	m_items.resize(size);
@@ -29,7 +30,7 @@ FillingContainer::~FillingContainer()
 
 void FillingContainer::_release(StackID stackId)
 {
-	m_items[stackId] = ItemStack::EMPTY;
+	_getItem(stackId) = ItemStack::EMPTY;
 }
 
 void FillingContainer::_clear()
@@ -45,7 +46,7 @@ void FillingContainer::_clear()
 
 void FillingContainer::_swapSlots(StackID stackIdA, StackID stackIdB)
 {
-	std::swap(m_items[stackIdA], m_items[stackIdB]);
+	std::swap(_getItem(stackIdA), _getItem(stackIdB));
 }
 
 ItemStack* FillingContainer::_tryGetLinked(int linkedIdx)
@@ -67,9 +68,286 @@ ItemStack* FillingContainer::_tryGetLinked(int linkedIdx)
 	return nullptr;
 }
 
+bool FillingContainer::_linkSlot(int key, StackID value, bool cycleSlots)
+{
+	if (key < 0)
+		return false;
+	if (key >= m_linkedSlotsCount)
+		return false;
+	if (m_linkedSlotsCount > value)
+		return false;
+	if (value >= this->m_size)
+		return false;
+
+	StackID& slotId = m_linkedSlots[key];
+	if (slotId == value)
+		return false;
+
+	// haven't actually read this over, validate via testing
+	if (cycleSlots)
+	{
+		Size end = m_linkedSlotsCount - 1;
+		if (end > 0 && m_linkedSlots[0] != value)
+		{
+			StackID id;
+			for (id = 0; m_linkedSlots[id] != value; id++)
+			{
+			}
+
+			if (key < id)
+			{
+				for (StackID i = id - 1; i != key; i--)
+				{
+					m_linkedSlots[i + 1] = m_linkedSlots[i];
+				}
+			}
+		}
+	}
+
+	slotId = value;
+
+	return true;
+}
+
+void FillingContainer::_compressLinkedSlotList(Size toSize)
+{
+	// also unread, validate
+	StackID i = toSize, j;
+	for (j = 0; i < m_linkedSlotsCount; i++)
+	{
+		m_linkedSlots[i - j] = m_linkedSlots[i];
+		if (!_tryGetLinked(i))
+			++j;
+	}
+
+	StackID v6 = i - j;
+	if (v6 < i)
+	{
+		std::fill(&m_linkedSlots[v6], &m_linkedSlots[i], C_INVALID_SLOT);
+	}
+}
+
+bool FillingContainer::_linkEmptySlot(StackID stackId)
+{
+	if (m_linkedSlotsCount <= 0)
+		return false;
+	if (m_linkedSlots[0] == stackId)
+		return true;
+
+	for (int i = 0; i != m_linkedSlotsCount; i++)
+	{
+		if (m_linkedSlots[i] == stackId)
+			return true;
+	}
+
+	int j = 0;
+	while (_tryGetLinked(j))
+	{
+		j++;
+		if (m_linkedSlotsCount <= j)
+			return false;
+	}
+
+	m_linkedSlots[j] = stackId;
+	return true;
+}
+
+void FillingContainer::_fixBackwardCompabilityItem(ItemStack& item) const
+{
+	if (item.getId() == Tile::treeTrunk->m_ID)
+	{
+		if (item.getAuxValue() == 0)
+			item.setAuxValue(1);
+	}
+}
+
+Container::StackID FillingContainer::_getSlot(int itemId) const
+{
+	for (size_t i = m_linkedSlotsCount; i < m_items.size(); i++)
+	{
+		const ItemStack& item = m_items[i];
+		if (item.getId() == itemId)
+			return i;
+	}
+
+	return C_INVALID_SLOT;
+}
+
+Container::StackID FillingContainer::_getSlot(int itemId, ItemStack::AuxValue auxValue) const
+{
+	for (size_t i = m_linkedSlotsCount; i < m_items.size(); i++)
+	{
+		const ItemStack& item = m_items[i];
+		if (item.getId() == itemId && item.getAuxValue() == auxValue)
+			return i;
+	}
+
+	return C_INVALID_SLOT;
+}
+
+Container::StackID FillingContainer::_getNonEmptySlot(int itemId) const
+{
+	for (size_t i = m_linkedSlotsCount; i < m_items.size(); i++)
+	{
+		const ItemStack& item = m_items[i];
+		if (item.getId() == itemId && item.m_count > 0)
+			return i;
+	}
+
+	return C_INVALID_SLOT;
+}
+
+Container::StackID FillingContainer::_getNonEmptySlot(int itemId, ItemStack::AuxValue auxValue) const
+{
+	for (size_t i = m_linkedSlotsCount; i < m_items.size(); i++)
+	{
+		const ItemStack& item = m_items[i];
+		if (item.getId() == itemId && item.getAuxValue() == auxValue && item.m_count > 0)
+			return i;
+	}
+
+	return C_INVALID_SLOT;
+}
+
+Container::StackID FillingContainer::_getFreeSlot() const
+{
+	for (size_t i = m_linkedSlotsCount; i < m_items.size(); i++)
+	{
+		const ItemStack& item = m_items[i];
+		if (item.m_count == 0)
+			return i;
+	}
+
+	return C_INVALID_SLOT;
+}
+
+Container::StackID FillingContainer::_getSlotWithRemainingSpace(const ItemStack& item) const
+{
+	for (size_t i = 0; i < m_items.size(); i++)
+	{
+		const ItemStack& slotItem = m_items[i];
+		if (slotItem.getId() != item.getId())
+			continue;
+
+		if (!slotItem.isStackable())
+			continue;
+
+		if (slotItem.m_count >= getMaxStackSize())
+			continue;
+
+		if (!slotItem.isStackedByData())
+			return i;
+		else if (slotItem.getAuxValue() == item.getAuxValue())
+			return i;
+	}
+
+	return C_INVALID_SLOT;
+}
+
+ItemStack& FillingContainer::_getItem(StackID stackId)
+{
+	std::vector<ItemStack>& slotList = _getSlotList(stackId);
+
+	return slotList[stackId];
+}
+
 std::vector<ItemStack>& FillingContainer::_getSlotList(StackID index)
 {
 	return m_items;
+}
+
+void FillingContainer::replaceSlot(StackID stackId, ItemStack* pItemStack)
+{
+	if (!pItemStack)
+	{
+		_release(stackId);
+	}
+
+	m_items[stackId] = *pItemStack;
+}
+
+void FillingContainer::clearSlot(StackID index)
+{
+	if (index < 0)
+		return;
+
+	if (index < m_linkedSlotsCount)
+	{
+		_release(m_linkedSlots[index]);
+		m_linkedSlots[index] = C_INVALID_SLOT;
+	}
+	else
+	{
+		_release(index);
+	}
+
+	_compressLinkedSlotList(index);
+}
+
+bool FillingContainer::hasResource(int itemId) const
+{
+	if (m_bUnlimited)
+		return true;
+	
+	return _getSlot(itemId) != C_INVALID_SLOT;
+}
+
+bool FillingContainer::removeResource(int itemId)
+{
+	if (m_bUnlimited)
+		return true;
+
+	StackID stackId = _getSlot(itemId);
+	if (stackId == C_INVALID_SLOT)
+		return false;
+
+	ItemStack& item = m_items[stackId];
+	item.m_count -= 1;
+
+	if (item.m_count <= 0)
+		_release(stackId);
+
+	return true;
+}
+
+bool FillingContainer::removeResource(const ItemStack& item)
+{
+	if (m_bUnlimited)
+		return true;
+
+	int remainingCount = item.m_count;
+	if (remainingCount <= 0)
+		return true;
+
+	int itemId = item.getId();
+	ItemStack::AuxValue auxValue = item.getAuxValue();
+	bool isAnyAux = Recipes::IsAnyAuxValue(itemId);
+
+	while (remainingCount > 0)
+	{
+		StackID stackId;
+		if (isAnyAux)
+			stackId = _getNonEmptySlot(itemId);
+		else
+			stackId = _getNonEmptySlot(itemId, auxValue);
+
+		if (stackId < 0)
+			return false;
+
+		ItemStack& slotItem = _getItem(stackId);
+
+		ItemStack::Count takeCount = Mth::Min<ItemStack::Count>(remainingCount, slotItem.m_count);
+
+		slotItem.m_count -= takeCount;
+		remainingCount -= takeCount;
+
+		if (slotItem.m_count <= 0)
+		{
+			clearSlot(stackId);
+		}
+	}
+
+	return true;
 }
 
 ItemStack& FillingContainer::getItem(StackID index)
@@ -80,8 +358,7 @@ ItemStack& FillingContainer::getItem(StackID index)
 	if (index < m_linkedSlotsCount)
 		index = m_linkedSlots[index];
 
-	std::vector<ItemStack>& slotList = _getSlotList(index);
-	return slotList[index];
+	return _getItem(index);
 }
 
 ItemStack FillingContainer::removeItem(StackID index, int count)
@@ -114,11 +391,11 @@ ItemStack FillingContainer::removeItem(StackID index, int count)
 
 void FillingContainer::setItem(StackID index, const ItemStack& item)
 {
-	std::vector<ItemStack>& slotList = _getSlotList(index);
-	slotList[index] = item;
+	ItemStack& slotItem = _getItem(index);
+	slotItem = item;
 
 	if (!item.isEmpty() && item.m_count > getMaxStackSize())
-		m_items[index].m_count = getMaxStackSize();
+		slotItem.m_count = getMaxStackSize();
 
 	setContainerChanged(index);
 }

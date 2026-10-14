@@ -15,11 +15,27 @@ protected:
 	void _clear();
 	void _swapSlots(StackID stackIdA, StackID stackIdB);
 	ItemStack* _tryGetLinked(int linkedIdx);
+	bool _linkSlot(int key, StackID value, bool cycleSlots = false);
+	void _compressLinkedSlotList(Size toSize);
+	bool _linkEmptySlot(StackID stackId);
+	void _fixBackwardCompabilityItem(ItemStack& item) const;
+	StackID _getSlot(int itemId) const;
+	StackID _getSlot(int itemId, ItemStack::AuxValue auxValue) const;
+	StackID _getNonEmptySlot(int itemId) const;
+	StackID _getNonEmptySlot(int itemId, ItemStack::AuxValue auxValue) const;
+	StackID _getFreeSlot() const;
+	StackID _getSlotWithRemainingSpace(const ItemStack& item) const;
+	ItemStack& _getItem(StackID stackId);
 
 protected:
 	virtual std::vector<ItemStack>& _getSlotList(StackID index);
 
 public:
+	void replaceSlot(StackID stackId, ItemStack* pItemStack);
+	void clearSlot(StackID index);
+	bool hasResource(int itemId) const;
+	bool removeResource(int itemId);
+	bool removeResource(const ItemStack& item);
 	Size getNumLinkedSlots() const { return m_linkedSlotsCount; }
 
 public:
