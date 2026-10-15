@@ -5,7 +5,6 @@
 #include "GameMods.hpp"
 #include "world/inventory/Container.hpp"
 #include "world/item/ItemStack.hpp"
-#include "world/entity/Player.hpp"
 #include "world/gamemode/GameType.hpp"
 #include "nbt/ListTag.hpp"
 
@@ -88,7 +87,6 @@ public:
 	bool stillValid(Player& player) const override { return true; }
 	
 private:
-	GameType _getGameMode() const { return m_pPlayer->getPlayerGameType(); }
 	int getSlotWithRemainingSpace(const ItemStack& item) const;
 	int getFreeSlot() const;
 	int addResource(const ItemStack& item);

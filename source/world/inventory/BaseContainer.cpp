@@ -16,16 +16,6 @@ bool BaseContainer::stillValid(Player& player) const
     return true;
 }
 
-void BaseContainer::startOpen()
-{
-
-}
-
-void BaseContainer::stopOpen()
-{
-
-}
-
 void BaseContainer::addContentChangeListener(ContainerContentChangeListener* listener)
 {
     m_contentChangeListeners.insert(listener);

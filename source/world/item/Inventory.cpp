@@ -4,6 +4,7 @@
 #include "common/Logger.hpp"
 #include "nbt/CompoundTag.hpp"
 #include "network/Packet.hpp"
+#include "world/entity/Player.hpp"
 #include "world/inventory/ContainerContentChangeListener.hpp"
 
 #include "Item.hpp"
@@ -84,7 +85,7 @@ void Inventory::prepareSurvivalInventory()
 	addCreativeItem(TILE_GLASS);
 	addCreativeItem(TILE_LEAVES);
 
-	if (_getGameMode() == GAME_TYPE_CREATIVE)
+	if (m_pPlayer->getPlayerGameType() == GAME_TYPE_CREATIVE)
 	{
 		addCreativeItem(TILE_BLOCK_GOLD);
 		addCreativeItem(TILE_BLOCK_IRON);
@@ -113,7 +114,7 @@ void Inventory::prepareSurvivalInventory()
 	for (size_t i = 0; i < m_items.size(); i++)
 	{
 		ItemStack& item = m_items[i];
-		if (_getGameMode() == GAME_TYPE_SURVIVAL && !hasUnlimitedResource(item))
+		if (m_pPlayer->getPlayerGameType() == GAME_TYPE_SURVIVAL && !hasUnlimitedResource(item))
 		{
 			item.m_count = 0;
 		}

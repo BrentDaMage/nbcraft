@@ -1,5 +1,6 @@
 #include "FillingContainer.hpp"
 #include "common/Logger.hpp"
+#include "nbt/CompoundTag.hpp"
 #include "world/entity/Player.hpp"
 #include "world/item/crafting/Recipes.hpp"
 
@@ -57,7 +58,7 @@ ItemStack* FillingContainer::_tryGetLinked(int linkedIdx)
 	{
 		stackId = m_linkedSlots[linkedIdx];
 
-		if (stackId > 0 && stackId >= m_linkedSlotsCount && stackId < m_size)
+		if (stackId >= m_linkedSlotsCount && stackId < m_size)
 		{
 			std::vector<ItemStack>& slotList = _getSlotList(stackId);
 
@@ -251,12 +252,50 @@ ItemStack& FillingContainer::_getItem(StackID stackId)
 	return slotList[stackId];
 }
 
+Container::Size FillingContainer::_addItem(ItemStack& item)
+{
+	Size currentSize = m_items.size();
+	Size startIndex = m_linkedSlotsCount;
+
+	if (startIndex < currentSize)
+	{
+		for (int i = startIndex; i < currentSize; i++)
+		{
+			if (m_items[i].isEmpty())
+			{
+				m_items[i] = item;
+				return i;
+			}
+		}
+	}
+
+	Size targetSize = currentSize + 1;
+
+	if (m_bUnlimited)
+	{
+		if (targetSize > m_size)
+			m_size = targetSize;
+	}
+	else if (targetSize > m_size)
+	{
+		std::string itemName = item.getDescriptionId();
+
+		LOG_E("Error@addItem: adding an item to an already full inventory: %s!", itemName.c_str());
+
+		return 0;
+	}
+
+	m_items.push_back(item);
+
+	return targetSize;
+}
+
 std::vector<ItemStack>& FillingContainer::_getSlotList(StackID index)
 {
 	return m_items;
 }
 
-void FillingContainer::replaceSlot(StackID stackId, ItemStack* pItemStack)
+void FillingContainer::replaceSlot(StackID stackId, const ItemStack* pItemStack)
 {
 	if (!pItemStack)
 	{
@@ -315,7 +354,7 @@ bool FillingContainer::removeResource(const ItemStack& item)
 	if (m_bUnlimited)
 		return true;
 
-	int remainingCount = item.m_count;
+	ItemStack::Count remainingCount = item.m_count;
 	if (remainingCount <= 0)
 		return true;
 
@@ -350,10 +389,233 @@ bool FillingContainer::removeResource(const ItemStack& item)
 	return true;
 }
 
+ItemStack::Count FillingContainer::addResource(const ItemStack& item)
+{
+	ItemStack::Count remainingCount = item.m_count;
+
+	if (item.getMaxStackSize() == 1)
+	{
+		StackID freeSlot = _getFreeSlot();
+		if (freeSlot == C_INVALID_SLOT)
+			return remainingCount;
+
+		ItemStack& slotItem = m_items[freeSlot];
+
+		// check if we were somehow given a non-empty slot
+		if (!slotItem.isEmpty())
+			return 0;
+
+		slotItem = item;
+		_linkEmptySlot(freeSlot);
+
+		return 0;
+	}
+
+	StackID slotId = _getSlotWithRemainingSpace(item);
+	if (slotId == C_INVALID_SLOT)
+		slotId = _getFreeSlot();
+
+	if (slotId == C_INVALID_SLOT)
+		return remainingCount; // couldn't find an open slot
+
+	ItemStack& slotItem = m_items[slotId];
+
+	if (slotItem.isEmpty())
+	{
+		m_items[slotId] = ItemStack(item.getId(), 0, item.getAuxValue());
+	}
+
+	_linkEmptySlot(slotId);
+
+	int maxStack = Mth::Min(slotItem.getMaxStackSize(), getMaxStackSize());
+	int availableSpace = maxStack - slotItem.m_count;
+
+	if (availableSpace <= 0)
+		return remainingCount; // no space left with its peers
+
+	ItemStack::Count countToAdd = Mth::Min<ItemStack::Count>(remainingCount, availableSpace);
+
+	if (countToAdd > 0)
+	{
+		remainingCount -= countToAdd;
+		slotItem.m_count += countToAdd;
+	}
+
+	return remainingCount;
+}
+
+void FillingContainer::dropSlot(StackID index, bool onlyClearContainer, bool b)
+{
+	if (index < m_linkedSlotsCount)
+		return;
+
+	StackID stackId = m_linkedSlots[index];
+	if (stackId == C_INVALID_SLOT)
+		return;
+
+	ItemStack& slotItem = _getItem(stackId);
+	if (slotItem.isEmpty())
+		return;
+
+	if (onlyClearContainer)
+	{
+		slotItem.m_count = 0;
+	}
+	else
+	{
+		doDrop(slotItem, b);
+	}
+
+	_release(stackId);
+	_compressLinkedSlotList(stackId);
+}
+
+void FillingContainer::dropAll(bool onlyClearContainer)
+{
+	for (size_t i = m_linkedSlotsCount; i < m_items.size(); i++)
+	{
+		dropSlot(i, onlyClearContainer);
+	}
+}
+
+void FillingContainer::replace(const std::vector<ItemStack>& items)
+{
+	_clear();
+
+	Size minSize = Mth::Min<Size>(getContainerSize() - m_linkedSlotsCount, m_items.size());
+	for (StackID i = 0; i < minSize; i++)
+	{
+		const ItemStack& slotItem = items[i];
+		replaceSlot(i + m_linkedSlotsCount, slotItem.isEmpty() ? nullptr : &slotItem);
+	}
+}
+
+void FillingContainer::save(ListTag& tag) const
+{
+	if (m_bUnlimited)
+		return;
+
+	for (size_t i = 0; i < m_items.size(); i++)
+	{
+		ItemStack item;
+
+		if (i < m_linkedSlotsCount)
+		{
+			item = ItemStack(255, 255, m_linkedSlots[i]);
+		}
+		else
+		{
+			const ItemStack& slotItem = m_items[i];
+
+			if (slotItem.isEmpty())
+				continue;
+
+			item = slotItem;
+		}
+
+		item.m_count = Mth::clamp<ItemStack::Count>(item.m_count, 0, 255);
+
+		CompoundTag* itemTag = new CompoundTag();
+		itemTag->putInt8("Slot", i);
+
+		item.save(*itemTag);
+		tag.add(itemTag);
+	}
+}
+
+void FillingContainer::load(const ListTag& tag)
+{
+	if (m_bUnlimited)
+		return;
+
+	_clear();
+
+	size_t containerSize = m_items.size();
+
+	const std::vector<Tag*>& itemTags = tag.rawView();
+
+	for (std::vector<Tag*>::const_iterator it = itemTags.begin(); it != itemTags.end(); it++)
+	{
+		const Tag* pTag = *it;
+
+		if (pTag->getId() != Tag::TAG_TYPE_COMPOUND)
+			continue;
+
+		const CompoundTag* itemTag = (const CompoundTag*)pTag;
+
+		uint8_t slotId = 0;
+		if (itemTag->contains("Slot", Tag::TAG_TYPE_INT8))
+		{
+			slotId = itemTag->getInt8("Slot");
+		}
+
+		ItemStack item = ItemStack::fromTag(*itemTag);
+		if (!item.isEmpty())
+		{
+			if (slotId < m_linkedSlotsCount)
+			{
+				if (slotId >= containerSize || item.getId() != 255 || item.m_count != 255)
+				{
+					LOG_E("Error: Slot %d is selection slot (inventory size: %d) but id/count is %d/%d", slotId, containerSize, item.getId(), item.m_count);
+				}
+				else
+				{
+					ItemStack::AuxValue auxValue = item.getAuxValue();
+
+					if (auxValue >= m_linkedSlotsCount && auxValue < containerSize)
+					{
+						_linkSlot(slotId, auxValue, 0);
+					}
+				}
+			}
+			else if (slotId >= 0 && slotId < m_items.size())
+			{
+				ItemStack& slotItem = m_items[slotId];
+				slotItem = item;
+				_fixBackwardCompabilityItem(slotItem);
+			}
+			/*else if (slotId >= 100 && slotId < m_armor.size() + 100)
+			{
+				m_armor[slotId - 100] = item;
+			}*/
+			else
+			{
+				doDrop(item, true);
+			}
+		}
+	}
+
+	_compressLinkedSlotList(0);
+}
+
+bool FillingContainer::contains(const ItemStack& item) const
+{
+	std::vector<ItemStack>::const_iterator itr = std::find(m_items.begin(), m_items.end(), item);
+
+	return itr != m_items.end();
+}
+
+Container::Size FillingContainer::getNumEmptySlots() const
+{
+	Size slotCount = 0;
+
+	for (size_t i = m_linkedSlotsCount; i < m_items.size(); i++)
+	{
+		const ItemStack& item = m_items[i];
+		if (item.isEmpty())
+			slotCount++;
+	}
+
+	return slotCount;
+}
+
 ItemStack& FillingContainer::getItem(StackID index)
 {
-	//if (index < 0 || index >= m_size)
-	//	return nullptr;
+	if (index >= m_size)
+	{
+		LOG_E("index is invalid for getItem: index=%d size=%d", index, getContainerSize());
+		throw std::invalid_argument("index");
+	}
 
 	if (index < m_linkedSlotsCount)
 		index = m_linkedSlots[index];
@@ -445,7 +707,7 @@ bool FillingContainer::add(ItemStack& item)
 	ItemStack::Count count;
 	for (ItemStack::Count i = 0; ; i = count)
 	{
-		count = _addResource(item);
+		count = addResource(item);
 		item.m_count = count;
 		if (count <= 0 || count >= i)
 			return i > count;

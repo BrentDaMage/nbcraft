@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "BaseContainer.hpp"
+#include "nbt/ListTag.hpp"
 
 class FillingContainer : public BaseContainer
 {
@@ -26,16 +27,25 @@ protected:
 	StackID _getFreeSlot() const;
 	StackID _getSlotWithRemainingSpace(const ItemStack& item) const;
 	ItemStack& _getItem(StackID stackId);
+	Size _addItem(ItemStack& item);
 
 protected:
 	virtual std::vector<ItemStack>& _getSlotList(StackID index);
 
 public:
-	void replaceSlot(StackID stackId, ItemStack* pItemStack);
+	void replaceSlot(StackID stackId, const ItemStack* pItemStack);
 	void clearSlot(StackID index);
 	bool hasResource(int itemId) const;
 	bool removeResource(int itemId);
 	bool removeResource(const ItemStack& item);
+	ItemStack::Count addResource(const ItemStack& item);
+	void dropSlot(StackID index, bool onlyClearContainer = false, bool b = false);
+	void dropAll(bool onlyClearContainer = false);
+	void replace(const std::vector<ItemStack>& items);
+	void save(ListTag& tag) const;
+	void load(const ListTag& tag);
+	bool contains(const ItemStack& item) const;
+	Size getNumEmptySlots() const;
 	Size getNumLinkedSlots() const { return m_linkedSlotsCount; }
 
 public:
