@@ -9,7 +9,7 @@ class FillingContainer : public BaseContainer
 {
 public:
 	FillingContainer(Size size, Size linkedSlotsCount, bool isUnlimited);
-	~FillingContainer();
+	virtual ~FillingContainer();
 
 protected:
 	void _release(StackID stackId);
@@ -30,7 +30,7 @@ protected:
 	Size _addItem(ItemStack& item);
 
 protected:
-	virtual std::vector<ItemStack>& _getSlotList(StackID index);
+	virtual std::vector<ItemStack>& _getSlotList(StackID& stackId);
 
 public:
 	void replaceSlot(StackID stackId, const ItemStack* pItemStack);

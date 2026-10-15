@@ -3,7 +3,7 @@
 #include <set>
 #include <vector>
 #include "GameMods.hpp"
-#include "world/inventory/Container.hpp"
+#include "world/inventory/FillingContainer.hpp"
 #include "world/item/ItemStack.hpp"
 #include "world/gamemode/GameType.hpp"
 #include "nbt/ListTag.hpp"
@@ -17,13 +17,18 @@ class Player; // in case we're included from Player.hpp
 #define C_NUM_INVENTORY_SLOTS (36)
 #define C_NUM_ARMOR_SLOTS (4)
 
-class Inventory : public Container
+class Inventory : public FillingContainer
 {
 private:
 	typedef std::set<ContainerContentChangeListener*> ContentChangeListeners;
 public:
 	Inventory(Player*);
 	virtual ~Inventory();
+
+protected:
+	std::vector<ItemStack>& _getSlotList(StackID& stackId) override;
+
+public:
 	void prepareCreativeInventory();
 	void prepareSurvivalInventory();
 
@@ -41,15 +46,15 @@ public:
 	bool add(ItemStack& item);
     void tick();
 
-	ItemStack& getItem(StackID stackId) override;
+	//ItemStack& getItem(StackID stackId) override;
 	ItemStack& getArmor(Item::EquipmentSlot slotNo);
 	ItemStack& getSelectedItem();
 	int getSelectedItemId();
 
-	void setItem(StackID stackId, const ItemStack& item) override;
+	//void setItem(StackID stackId, const ItemStack& item) override;
 	void setSelectedItem(const ItemStack& item);
-	ItemStack removeItem(StackID stackId, int count) override;
-	bool removeResource(int id);
+	//ItemStack removeItem(StackID stackId, int count) override;
+	//bool removeResource(int id);
 	int removeIngredient(const ItemStack&);
 
 	void setCarried(const ItemStack& item);
@@ -61,6 +66,9 @@ public:
 	void selectItem(int itemID, int maxHotBarSlot);
 	void swapItems(StackID stackIdA, StackID stackIdB);
 	void selectSlot(StackID stackId);
+	bool moveToSelectionSlot(int key, StackID value, bool cycleSlots = false);
+	bool moveToSelectedSlot(StackID stackId, bool cycleSlots = false);
+	bool moveToEmptySelectionSlot(StackID stackId);
 
 	int getAttackDamage(Entity&);
 
@@ -79,18 +87,12 @@ public:
 
 	// v0.2.0 name alias
 	ItemStack& getSelected() { return getSelectedItem(); }
-
-	void setContainerChanged(StackID stackId) override;
-	void addContentChangeListener(ContainerContentChangeListener* listener) override;
-	void removeContentChangeListener(ContainerContentChangeListener* listener) override;
-
-	bool stillValid(Player& player) const override { return true; }
 	
 private:
-	int getSlotWithRemainingSpace(const ItemStack& item) const;
+	/*int getSlotWithRemainingSpace(const ItemStack& item) const;
 	int getFreeSlot() const;
 	int addResource(const ItemStack& item);
-	int getSlot(int id) const;
+	int getSlot(int id) const;*/
 
 public:
 	Player* m_pPlayer;
@@ -99,7 +101,5 @@ public:
 private:
 	ItemStack m_carried;
 
-	std::vector<ItemStack> m_items;
 	std::vector<ItemStack> m_armor;
-	ContentChangeListeners m_contentChangeListeners;
 };

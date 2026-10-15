@@ -1,10 +1,13 @@
+#define __STDC_LIMIT_MACROS
+#include <stdint.h>
+
 #include "FillingContainer.hpp"
 #include "common/Logger.hpp"
 #include "nbt/CompoundTag.hpp"
 #include "world/entity/Player.hpp"
 #include "world/item/crafting/Recipes.hpp"
 
-#define C_INVALID_SLOT -1
+#define C_INVALID_SLOT UINT16_MAX
 
 FillingContainer::FillingContainer(Size size, Size linkedSlotsCount, bool isUnlimited)
 	: m_linkedSlots(nullptr)
@@ -15,7 +18,7 @@ FillingContainer::FillingContainer(Size size, Size linkedSlotsCount, bool isUnli
 	if (linkedSlotsCount > 0)
 	{
 		m_linkedSlots = new StackID[m_linkedSlotsCount];
-		std::fill(m_linkedSlots, &m_linkedSlots[m_linkedSlotsCount - 1], C_INVALID_SLOT);
+		std::fill(m_linkedSlots, &m_linkedSlots[m_linkedSlotsCount], C_INVALID_SLOT);
 	}
 
 	m_items.resize(size);
@@ -84,28 +87,32 @@ bool FillingContainer::_linkSlot(int key, StackID value, bool cycleSlots)
 	if (slotId == value)
 		return false;
 
-	// haven't actually read this over, validate via testing
+	LOG_I("shifting linkedSlots: %d, %d, %d, %d, %d, %d, %d, %d, %d", m_linkedSlots[0], m_linkedSlots[1], m_linkedSlots[2], m_linkedSlots[3], m_linkedSlots[4], m_linkedSlots[5], m_linkedSlots[6], m_linkedSlots[7], m_linkedSlots[8]);
+
 	if (cycleSlots)
 	{
 		Size end = m_linkedSlotsCount - 1;
 		if (end > 0 && m_linkedSlots[0] != value)
 		{
 			StackID id;
-			for (id = 0; m_linkedSlots[id] != value; id++)
+			for (id = 0; id < end && m_linkedSlots[id] != value; id++)
 			{
 			}
 
+			// loop right-to-left and shift slots over
 			if (key < id)
 			{
-				for (StackID i = id - 1; i != key; i--)
+				for (StackID i = id; i != key; i--)
 				{
-					m_linkedSlots[i + 1] = m_linkedSlots[i];
+					m_linkedSlots[i] = m_linkedSlots[i - 1];
 				}
 			}
 		}
 	}
 
 	slotId = value;
+
+	LOG_I("shifted linkedSlots: %d, %d, %d, %d, %d, %d, %d, %d, %d", m_linkedSlots[0], m_linkedSlots[1], m_linkedSlots[2], m_linkedSlots[3], m_linkedSlots[4], m_linkedSlots[5], m_linkedSlots[6], m_linkedSlots[7], m_linkedSlots[8]);
 
 	return true;
 }
@@ -124,7 +131,7 @@ void FillingContainer::_compressLinkedSlotList(Size toSize)
 	StackID v6 = i - j;
 	if (v6 < i)
 	{
-		std::fill(&m_linkedSlots[v6], &m_linkedSlots[i], C_INVALID_SLOT);
+		std::fill(&m_linkedSlots[v6], &m_linkedSlots[i+1], C_INVALID_SLOT);
 	}
 }
 
@@ -290,19 +297,21 @@ Container::Size FillingContainer::_addItem(ItemStack& item)
 	return targetSize;
 }
 
-std::vector<ItemStack>& FillingContainer::_getSlotList(StackID index)
+std::vector<ItemStack>& FillingContainer::_getSlotList(StackID& stackId)
 {
 	return m_items;
 }
 
 void FillingContainer::replaceSlot(StackID stackId, const ItemStack* pItemStack)
 {
-	if (!pItemStack)
+	if (pItemStack)
+	{
+		m_items[stackId] = *pItemStack;
+	}
+	else
 	{
 		_release(stackId);
 	}
-
-	m_items[stackId] = *pItemStack;
 }
 
 void FillingContainer::clearSlot(StackID index)
@@ -611,14 +620,18 @@ Container::Size FillingContainer::getNumEmptySlots() const
 
 ItemStack& FillingContainer::getItem(StackID index)
 {
-	if (index >= m_size)
+	if (index >= getContainerSize())
 	{
 		LOG_E("index is invalid for getItem: index=%d size=%d", index, getContainerSize());
 		throw std::invalid_argument("index");
 	}
 
 	if (index < m_linkedSlotsCount)
-		index = m_linkedSlots[index];
+	{
+		StackID newIndex = m_linkedSlots[index];
+		if (newIndex != C_INVALID_SLOT)
+			index = newIndex;
+	}
 
 	return _getItem(index);
 }

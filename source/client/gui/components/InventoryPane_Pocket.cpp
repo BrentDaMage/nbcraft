@@ -181,7 +181,7 @@ void InventoryPane_Pocket::renderBatch(std::vector<GridItem>& items, float a)
 
 void InventoryPane_Pocket::onSelect(int id, bool isSelected)
 {
-    if (!m_callback.isAllowed(id))
+    if (!m_callback.isAllowed(id) || !isSelected)
         return;
 
     bool success = m_callback.addItem(*this, id);

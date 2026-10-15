@@ -179,12 +179,15 @@ bool InventoryScreen_Pocket::isPauseScreen()
 bool InventoryScreen_Pocket::addItem(const InventoryPane_Pocket& pane, int id)
 {
 	Inventory& inventory = *m_pPlayer->m_pInventory;
-	Container::StackID stackId = inventory.getItem(id + 9);
+	ItemStack& slotItem = inventory.getItem(C_MAX_HOTBAR_ITEMS + id);
+	if (slotItem.isEmpty())
+		return false;
 
-	//inventory.moveToSelectionSlot(0, id + 9, 1);
+	inventory.moveToSelectionSlot(0, C_MAX_HOTBAR_ITEMS + id, true);
 	inventory.selectSlot(0);
 	m_pMinecraft->m_pSoundEngine->playUI("random.pop", 1.0f, 0.3f);
 	//m_pMinecraft->m_pGui->flashSlot(0);
+
 	return true;
 }
 
@@ -195,10 +198,7 @@ std::vector<const ItemStack*> InventoryScreen_Pocket::getItems(const InventoryPa
     Inventory& inventory = *m_pPlayer->m_pInventory;
     size_t containerSize = inventory.getContainerSize();
 
-	if (containerSize <= 9)
-		return result;
-
-	for (Container::StackID stackId = 0; stackId < containerSize; stackId++)
+	for (Container::StackID stackId = C_MAX_HOTBAR_ITEMS; stackId < containerSize; stackId++)
 	{
 		result.push_back(&inventory.getItem(stackId));
 	}
