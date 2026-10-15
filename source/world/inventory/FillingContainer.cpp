@@ -34,6 +34,9 @@ FillingContainer::~FillingContainer()
 
 void FillingContainer::_release(StackID stackId)
 {
+	if (stackId == C_INVALID_SLOT)
+		return;
+
 	_getItem(stackId) = ItemStack::EMPTY;
 }
 
