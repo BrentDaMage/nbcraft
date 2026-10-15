@@ -78,8 +78,8 @@ public:
 
 	void dropAll(bool onlyClearContainer = false);
 
-	void save(ListTag& tag) const;
-	void load(const ListTag&);
+	/*void save(ListTag& tag) const;
+	void load(const ListTag&);*/
 
 	bool contains(const ItemStack&) const;
 

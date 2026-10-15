@@ -628,7 +628,7 @@ void Inventory::dropAll(bool onlyClearContainer)
 	}
 }
 
-void Inventory::save(ListTag& tag) const
+/*void Inventory::save(ListTag& tag) const
 {
 	for (size_t i = 0; i < m_items.size(); i++)
 	{
@@ -639,16 +639,6 @@ void Inventory::save(ListTag& tag) const
 
 		CompoundTag* itemTag = new CompoundTag();
 		itemTag->putInt8("Slot", i);
-		/* On PE, Mojang for some reason limited something saved as a 16-bit signed integer to a 0-255 range.
-		if (item.getAuxValue() < 0)
-		{
-			item.setAuxValue(0);
-		}
-		else if (item.getAuxValue > 255)
-		{
-			item.setAuxValue(255);
-		}
-		*/
 		item.save(*itemTag);
 		tag.add(itemTag);
 	}
@@ -698,4 +688,4 @@ void Inventory::load(const ListTag& tag)
 			}
 		}
 	}
-}
+}*/
