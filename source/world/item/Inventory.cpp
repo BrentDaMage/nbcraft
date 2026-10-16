@@ -145,7 +145,7 @@ std::string Inventory::getName() const
 
 Container::Size Inventory::getContainerSize() const
 {
-	return (Size)(m_items.size() + m_armor.size());
+	return FillingContainer::getContainerSize() + m_armor.size();
 }
 
 void Inventory::clear()

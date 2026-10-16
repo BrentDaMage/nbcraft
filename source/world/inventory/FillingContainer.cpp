@@ -322,7 +322,7 @@ void FillingContainer::clearSlot(StackID index)
 	if (index < 0)
 		return;
 
-	if (index < m_linkedSlotsCount)
+	if (index < m_linkedSlotsCount && m_linkedSlots[index] != C_INVALID_SLOT)
 	{
 		_release(m_linkedSlots[index]);
 		m_linkedSlots[index] = C_INVALID_SLOT;
@@ -584,7 +584,7 @@ void FillingContainer::load(const ListTag& tag)
 			{
 				ItemStack& slotItem = m_items[slotId];
 				slotItem = item;
-				_fixBackwardCompabilityItem(slotItem);
+				//_fixBackwardCompabilityItem(slotItem);
 			}
 			/*else if (slotId >= 100 && slotId < m_armor.size() + 100)
 			{
@@ -669,7 +669,7 @@ ItemStack FillingContainer::removeItem(StackID index, int count)
 
 void FillingContainer::setItem(StackID index, const ItemStack& item)
 {
-	ItemStack& slotItem = _getItem(index);
+	ItemStack& slotItem = getItem(index);
 	slotItem = item;
 
 	if (!item.isEmpty() && item.m_count > getMaxStackSize())

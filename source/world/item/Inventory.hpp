@@ -85,6 +85,10 @@ public:
 
 	StackID getSelectedSlotNo() const { return m_selectedStackId; }
 
+	Size getNumItemSlots() const { return FillingContainer::getContainerSize(); }
+	Size getNumArmorSlots() const { return (Size)m_armor.size(); }
+	Size getNumHotbarSlots() const { return getNumLinkedSlots(); }
+
 	// v0.2.0 name alias
 	ItemStack& getSelected() { return getSelectedItem(); }
 	
